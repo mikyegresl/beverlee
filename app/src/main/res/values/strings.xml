@@ -1,0 +1,181 @@
+<resources>
+    <!-- fragment labels -->
+    <string name="init_fragment">Init Fragment</string>
+    <string name="input_phone_fragment">Input Phone Fragment</string>
+    <string name="input_sms_fragment">Input Sms Fragment</string>
+    <!-- app strings -->
+    <string name="app_name">BeverLee Bank</string>
+    <string name="action_settings">Settings</string>
+    <!-- pages -->
+    <!-- initialization -->
+    <string name="logo_content_desc">BeverLee Logo</string>
+    <string name="text_content_desc">BeverLee Text</string>
+    <string name="sign_up">Создать новый аккаунт</string>
+    <string name="signing">Вход</string>
+    <string name="sign_in">Войти</string>
+    <!-- sign in -->
+    <string name="input_phone">Введите ваш номер телефона</string>
+    <string name="password">Пароль</string>
+    <string name="forgot_password">Забыли пароль?</string>
+    <!-- sign up -->
+    <string name="new_account">Новый аккаунт</string>
+    <string name="username_text">Как к Вам обращаться</string>
+    <string name="password_text">Придумайте пароль</string>
+    <string name="repeat_password_text">Повторите</string>
+    <string name="user_agreement">Я согласен с <u>Пользовательским соглашением</u>"\n"BeverLee</string>
+    <!-- pincode -->
+    <string name="create_pin">Создайте PIN-код</string>
+    <string name="enter_pin">Введите PIN-код</string>
+    <string name="repeat_pin">Повторите PIN-код</string>
+    <string name="forgot_pin">Забыли PIN-код?</string>
+    <string name="or_enter_pin">Или введите PIN-код</string>
+    <string name="error_pin">Пароли не совпадают</string>
+    <string name="one">1</string>
+    <string name="two">2</string>
+    <string name="three">3</string>
+    <string name="four">4</string>
+    <string name="five">5</string>
+    <string name="six">6</string>
+    <string name="seven">7</string>
+    <string name="eight">8</string>
+    <string name="nine">9</string>
+    <!-- splash screen -->
+    <string name="welcome_text">Добро пожаловать, </string>
+    <string name="firstname_text">Александр!</string>
+    <!-- sms verification -->
+    <string name="sms_text">Подтверждение СМС</string>
+    <string name="input_sms">Введите 5-значный код, который мы"\n"отправили на номер:</string>
+    <string name="hidden_digits">**** ** *** </string>
+    <string name="last_two_digits">54 55</string>
+    <string name="send_again">Отправить снова</string>
+    <string name="counter_text">00:00</string>
+    <!-- fingerprint -->
+    <string name="face_id_text">Пожалуйста, наведите"\n"фронтальную камеру на лицо</string>
+    <string name="fingerprint_text">Пожалуйста, приложите палец"\n"к сканеру для авторизации</string>
+    <string name="success_face_id">Принято!</string>
+    <string name="success_fingerprint">Отпечаток принят!</string>
+    <string name="error_face_id">Не принято!</string>
+    <string name="error_fingerprint">Отпечаток не принят!"\n"Попробуйте снова.</string>
+    <!-- home page -->
+    <string name="home">Кабинет</string>
+    <string name="monitoring">Мониторинг</string>
+    <string name="cards">Карты</string>
+    <string name="contact_name">Георгий Павлович</string>
+    <string name="balance">Баланс счета</string>
+    <string name="summary">$ 23 650,92</string>
+    <string name="debit">Пополнить</string>
+    <string name="withdraw">Вывести</string>
+    <string name="profit">Доходы за май</string>
+    <string name="profit_summary">+ 1 200,00 $</string>
+    <string name="master_card_name">Master Card Yandex</string>
+    <string name="visa_card_name">Visa Card Tinkoff</string>
+    <string name="master_card_number">4108 59** **** 8260</string>
+    <string name="visa_card_number">4000 12** **** 6580</string>
+    <string name="advert_content">Выводите ваши"\n"средства, на карту"\n"Mastercard под 0%</string>
+    <!-- monitoring -->
+    <string name="monitoring_header">Мониторинг счета</string>
+    <string name="income">Доходы</string>
+    <string name="income_may">Доходы за Май</string>
+    <string name="expenditure">Траты</string>
+    <string name="received_200">Получено 200 $</string>
+    <string name="debit_200">Пополнение 200 $</string>
+    <string name="bonus_200">Бонусы 200 $</string>
+    <string name="bonus">Бонус</string>
+    <string name="beverlee">BEVERLee</string>
+    <string name="received">Получено</string>
+    <string name="vladislav_romanov">Владислав Романов</string>
+    <string name="card_number">4108 59** **** 8230</string>
+    <string name="plus_200">+ 200 $</string>
+    <string name="plus_500">+ 500 $</string>
+    <string name="may_12">12 мая</string>
+    <string name="may_10">10 мая</string>
+    <!-- contacts page -->
+    <string name="contacts">Контакты</string>
+    <string name="all">Все</string>
+    <string name="favorites">Избранные</string>
+    <string name="contact_name_1">Аброр Турсунов</string>
+    <string name="contact_name_2">Нигора Икромова</string>
+    <string name="transfer">Перевод</string>
+    <string name="add_to_favorites">Добавить в избранные</string>
+    <string name="delete">Удалить</string>
+    <string name="delete_from_favorites">Удалить из избранных</string>
+    <!-- my cards page -->
+    <string name="my_cards">Мои карты</string>
+    <string name="card">Card</string>
+    <string name="card_no">1234 5678 9012 3456</string>
+    <string name="card_username">Антон Камушкин</string>
+    <string name="card_expiration_date">01/08</string>
+    <string name="edit">Редактировать</string>
+    <!-- cards: transfer/debit/withdrawal -->
+    <string name="accessible">Доступно</string>
+    <string name="debited">Пополнение</string>
+    <string name="withdrawal">Вывод</string>
+    <string name="choose_a_card">Выберите карту</string>
+    <string name="card_name">Название карты</string>
+    <string name="transfer_success">Успешный перевод!</string>
+    <string name="transfer_failure">Что-то пошло не так!</string>
+    <string name="send">Отправить</string>
+    <string name="card_number_">Номер на карте</string>
+    <string name="sender">Кому</string>
+    <string name="name_on_card">Имя, фамилия на карте</string>
+    <string name="month_year">Срок действия</string>
+    <string name="security_code">Защитный код</string>
+    <string name="security_code_hint">779</string>
+    <string name="sum">Сумма</string>
+    <string name="create_card">Добавить карту</string>
+    <!-- EditText hints -->
+    <string name="phone_hint">"+"</string>
+    <string name="phone_hint_uz">"+998"</string>
+    <string name="password_hint">****</string>
+    <string name="username_hint">Имя, Фамилия</string>
+    <string name="input_code">Введите код</string>
+    <string name="search">Поиск</string>
+    <string name="zero">0</string>
+    <string name="fullname_or_id">Имя, Фамилия или ID</string>
+    <!-- profile -->
+    <string name="profile">Профиль</string>
+    <string name="profile_name">Людмила Плюшкина</string>
+    <string name="identifier">Идентификатор: 21</string>
+    <string name="club_number">Клубный номер: 305</string>
+    <!-- personal data -->
+    <string name="personal_data">Персональные данные</string>
+    <string name="first_name">Полное имя</string>
+    <string name="last_name">Фамилия</string>
+    <string name="position">Должность</string>
+    <string name="contact_number">Контактный номер</string>
+    <string name="email">Электронная почта</string>
+    <string name="country">Страна</string>
+    <string name="first_name_example">Людмила</string>
+    <string name="last_name_example">Плюшкина</string>
+    <string name="position_example">Массажист</string>
+    <string name="contact_number_example">99899 554 26 59</string>
+    <string name="email_example">example@list.com</string>
+    <string name="country_example">Uzbekistan</string>
+    <string name="save">Сохранить</string>
+    <!-- notifications settings -->
+    <string name="notifications">Уведомления</string>
+    <string name="notify_news">Уведомлять о новостях</string>
+    <string name="notify_bonuses">Уведомлять о получении"\n"бонусов</string>
+    <string name="notify_income">Уведомлять о получении"\n"средств</string>
+    <string name="notify_purchase">Уведомлять о покупке"\n"продукта</string>
+    <string name="notify_debit">Уведомлять о пополнении"\n"баланса</string>
+    <string name="notify_withdrawal">Уведомлять о выводе средств</string>
+    <!-- password change -->
+    <string name="password_change">Смена пароля</string>
+    <string name="old_password">Старый пароль</string>
+    <string name="new_password">Новый пароль</string>
+    <string name="confirm_password">Подтвердите новый пароль</string>
+    <!-- notifications -->
+    <string name="date_example">15.06.20</string>
+    <string name="time_example">13:32</string>
+    <string name="push_example">Вклад \"Smart Вклад\" успешно"\n"открыт</string>
+    <string name="apply">Применить</string>
+    <!-- calendar -->
+    <string name="calendar">Календарь</string>
+    <string name="choose_a_period">Выберите период</string>
+    <!-- add card -->
+    <string name="add_card">Добавить карту</string>
+    <string name="add">Добавить</string>
+    <string name="to_main">На главную</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

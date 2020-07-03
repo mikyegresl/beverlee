@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.fragments.DebitFragment"
+    android:background="@drawable/background"
+    android:fitsSystemWindows="true">
+
+    <TextView
+        android:id="@+id/debit_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp"
+        android:text="@string/debited"
+        android:textAllCaps="false"
+        android:textColor="#fff"
+        android:fontFamily="@font/geometria_medium"
+        android:textSize="19sp"
+        android:gravity="center"/>
+
+    <ImageView
+        android:id="@+id/back_arrow_image_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/card_layout"
+        app:layout_constraintDimensionRatio="H, 1:1"
+        android:src="@drawable/ic_back_vector"
+        android:scaleType="fitCenter"
+        android:padding="16dp"
+        android:layout_marginVertical="16dp"
+        android:layout_marginStart="8dp"
+        android:contentDescription="@string/debit"/>
+
+    <ImageView
+        android:id="@+id/plus_image_view"
+        android:layout_width="0dp"
+        android:layout_height="22.4dp"
+        app:layout_constraintTop_toTopOf="@id/debit_text_view"
+        app:layout_constraintBottom_toBottomOf="@id/debit_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/ic_plus"
+        android:contentDescription="@string/my_cards"/>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/card_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/debit_text_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/card_top_radius_light"
+        android:fillViewport="true"
+        android:fitsSystemWindows="true"
+        android:overScrollMode="always">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/accessible_text_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="42dp"
+                android:text="@string/accessible"
+                android:gravity="center"
+                android:fontFamily="@font/geometria_actual"
+                android:textColor="#3B3A39"
+                android:textSize="15sp"/>
+
+            <TextView
+                android:id="@+id/accessible_number_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/accessible_text_view"
+                android:layout_marginTop="7dp"
+                android:textColor="#3B3A39"
+                android:gravity="center"
+                android:fontFamily="@font/geometria_bold"
+                android:textSize="27sp"
+                android:text="@string/summary"/>
+
+            <TextView
+                android:id="@+id/sum_text_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/accessible_number_text_view"
+                app:layout_constraintStart_toStartOf="parent"
+                android:fontFamily="@font/geometria_actual"
+                android:layout_marginStart="37dp"
+                android:layout_marginTop="13dp"
+                android:text="@string/sum"
+                android:textColor="#3B3A39"
+                android:textSize="15sp"/>
+
+            <EditText
+                android:id="@+id/sum_edit_text"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/sum_text_view"
+                android:layout_marginTop="13dp"
+                android:layout_marginHorizontal="28dp"
+                android:autofillHints="@string/password"
+                android:background="@drawable/edit_text_locked"
+                android:fontFamily="@font/geometria_medium"
+                android:hint="@string/zero"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                android:paddingStart="22dp"
+                android:paddingEnd="22dp"
+                android:textColor="#3B3A39"
+                android:textColorHint="#DBDCEA"
+                android:textSize="19sp" />
+
+            <TextView
+                android:id="@+id/choose_card_text_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/sum_edit_text"
+                app:layout_constraintStart_toStartOf="@id/sum_text_view"
+                android:layout_marginTop="23dp"
+                android:fontFamily="@font/geometria_actual"
+                android:text="@string/choose_a_card"
+                android:textColor="#3B3A39"
+                android:textSize="15sp"/>
+
+            <RelativeLayout
+                android:id="@+id/choose_card_field"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@id/sum_edit_text"
+                app:layout_constraintEnd_toEndOf="@id/sum_edit_text"
+                app:layout_constraintTop_toBottomOf="@id/choose_card_text_view"
+                android:layout_marginTop="13dp">
+
+                <EditText
+                    android:id="@+id/choose_card_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:background="@drawable/edit_text_locked"
+                    android:paddingStart="22dp"
+                    android:paddingEnd="22dp"
+                    android:fontFamily="@font/geometria_medium"
+                    android:textSize="19sp"
+                    android:textColor="#3B3A39"
+                    android:autofillHints="@string/password"
+                    android:inputType="numberDecimal"
+                    android:hint="@string/zero"
+                    android:textColorHint="#DBDCEA"
+                    android:maxLines="1"/>
+
+                <ImageView
+                    android:id="@+id/exclamation_image_view"
+                    android:layout_width="29dp"
+                    android:layout_height="19dp"
+                    android:layout_alignEnd="@id/choose_card_edit_text"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_cards_grey"
+                    android:scaleType="fitCenter"
+                    android:layout_marginEnd="17dp"
+                    android:contentDescription="@string/password"/>
+            </RelativeLayout>
+
+            <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
+                android:id="@+id/debit_btn"
+                android:layout_width="0dp"
+                android:layout_height="65dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:background="@drawable/btn_purple"
+                android:text="@string/debit"
+                android:textAllCaps="false"
+                android:fontFamily="@font/geometria_medium"
+                android:textColor="#fff"
+                android:layout_marginHorizontal="50dp"
+                android:layout_marginBottom="50dp"
+                android:textSize="17sp"
+                android:elevation="2dp"
+                app:spinning_bar_color="@color/colorWhite"
+                app:spinning_bar_padding="12dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

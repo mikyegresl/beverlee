@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/home_navigation"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="uz.alex.its.beverlee.view.fragments.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_notificationsFragment"
+            app:destination="@id/notificationsFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_debitFragment"
+            app:destination="@id/debitFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_withdrawalFragment"
+            app:destination="@id/withdrawalFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="uz.alex.its.beverlee.view.fragments.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/debitFragment"
+        android:name="uz.alex.its.beverlee.view.fragments.DebitFragment"
+        android:label="fragment_debit"
+        tools:layout="@layout/fragment_debit" />
+    <fragment
+        android:id="@+id/notificationsFragment"
+        android:name="uz.alex.its.beverlee.view.fragments.NotificationsFragment"
+        android:label="fragment_notifications"
+        tools:layout="@layout/fragment_notifications" />
+    <fragment
+        android:id="@+id/withdrawalFragment"
+        android:name="uz.alex.its.beverlee.view.fragments.WithdrawalFragment"
+        android:label="fragment_withdrawal"
+        tools:layout="@layout/fragment_withdrawal" />
+</navigation>

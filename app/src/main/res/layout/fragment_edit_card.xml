@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.fragments.EditCardFragment"
+    android:background="@drawable/background">
+
+    <TextView
+        android:id="@+id/edit_card_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp"
+        android:text="@string/edit"
+        android:textAllCaps="false"
+        android:textColor="#fff"
+        android:fontFamily="@font/geometria_medium"
+        android:textSize="19sp"
+        android:gravity="center"/>
+
+    <ImageView
+        android:id="@+id/back_arrow_image_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/scroll_layout"
+        app:layout_constraintDimensionRatio="H, 1:1"
+        android:src="@drawable/ic_back_vector"
+        android:scaleType="fitCenter"
+        android:padding="16dp"
+        android:layout_marginVertical="16dp"
+        android:layout_marginStart="8dp"
+        android:contentDescription="@string/transfer"/>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/edit_card_text_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/card_top_radius_light"
+        android:fillViewport="true"
+        android:fitsSystemWindows="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/card_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/card_number_text_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="41dp"
+                android:layout_marginTop="26dp"
+                android:text="@string/card_number_"
+                android:fontFamily="@font/geometria_actual"
+                android:textColor="#3B3A39"
+                android:textSize="15sp"/>
+
+            <EditText
+                android:id="@+id/card_number_edit_text"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                app:layout_constraintTop_toBottomOf="@+id/card_number_text_view"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:background="@drawable/edit_text_filled"
+                android:layout_marginTop="9dp"
+                android:layout_marginStart="28dp"
+                android:layout_marginEnd="28dp"
+                android:fontFamily="@font/geometria_medium"
+                android:textSize="19sp"
+                android:textColor="#3B3A39"
+                android:autofillHints="@string/input_phone"
+                android:inputType="numberDecimal"
+                android:hint="@string/card_no"
+                android:text="@string/card_no"
+                android:maxLength="15"
+                android:textColorHint="#DBDCEA"
+                android:paddingStart="17dp"
+                android:paddingEnd="17dp"
+                android:maxLines="1"/>
+
+            <TextView
+                android:id="@+id/full_name_text_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/card_number_edit_text"
+                app:layout_constraintStart_toStartOf="@id/card_number_text_view"
+                android:layout_marginTop="24dp"
+                android:fontFamily="@font/geometria_actual"
+                android:text="@string/name_on_card"
+                android:textColor="#3B3A39"
+                android:textSize="15sp"/>
+
+            <EditText
+                android:id="@+id/full_name_edit_text"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                app:layout_constraintTop_toBottomOf="@+id/full_name_text_view"
+                app:layout_constraintStart_toStartOf="@id/card_number_edit_text"
+                app:layout_constraintEnd_toEndOf="@id/card_number_edit_text"
+                android:background="@drawable/edit_text_filled"
+                android:layout_marginTop="9dp"
+                android:paddingStart="22dp"
+                android:paddingEnd="22dp"
+                android:fontFamily="@font/geometria_medium"
+                android:textSize="19sp"
+                android:textColor="#3B3A39"
+                android:autofillHints="@string/username_text"
+                android:inputType="textPersonName"
+                android:hint="@string/card_username"
+                android:text="@string/card_username"
+                android:textColorHint="#DBDCEA"
+                android:maxLines="1"/>
+
+            <TextView
+                android:id="@+id/month_year_text_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/full_name_edit_text"
+                app:layout_constraintStart_toStartOf="@id/card_number_text_view"
+                android:layout_marginTop="24dp"
+                android:fontFamily="@font/geometria_actual"
+                android:text="@string/month_year"
+                android:textColor="#3B3A39"
+                android:textSize="15sp"/>
+
+            <EditText
+                android:id="@+id/month_year_edit_text"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                app:layout_constraintTop_toBottomOf="@+id/month_year_text_view"
+                app:layout_constraintStart_toStartOf="@id/card_number_edit_text"
+                app:layout_constraintEnd_toEndOf="@id/card_number_edit_text"
+                android:background="@drawable/edit_text_filled"
+                android:layout_marginTop="9dp"
+                android:paddingStart="22dp"
+                android:paddingEnd="22dp"
+                android:fontFamily="@font/geometria_medium"
+                android:textSize="19sp"
+                android:textColor="#3B3A39"
+                android:autofillHints="@string/card_expiration_date"
+                android:inputType="numberDecimal"
+                android:hint="@string/card_expiration_date"
+                android:text="@string/card_expiration_date"
+                android:textColorHint="#DBDCEA"
+                app:layout_constraintHorizontal_weight="1"
+                android:maxLength="5"/>
+
+            <TextView
+                android:id="@+id/card_name_text_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/month_year_edit_text"
+                app:layout_constraintStart_toStartOf="@id/card_number_text_view"
+                android:layout_marginTop="24dp"
+                android:fontFamily="@font/geometria_actual"
+                android:text="@string/card_name"
+                android:textColor="#3B3A39"
+                android:textSize="15sp"/>
+
+            <EditText
+                android:id="@+id/card_name_edit_text"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                app:layout_constraintTop_toBottomOf="@+id/card_name_text_view"
+                app:layout_constraintStart_toStartOf="@id/card_number_edit_text"
+                app:layout_constraintEnd_toEndOf="@id/card_number_edit_text"
+                android:background="@drawable/edit_text_filled"
+                android:layout_marginTop="9dp"
+                android:paddingStart="22dp"
+                android:paddingEnd="22dp"
+                android:fontFamily="@font/geometria_medium"
+                android:textSize="19sp"
+                android:textColor="#3B3A39"
+                android:autofillHints="@string/card_name"
+                android:inputType="text"
+                android:maxLines="1"
+                android:hint="@string/card_name"
+                android:text="@string/card_name"
+                android:textColorHint="#DBDCEA"/>
+
+
+            <Button
+                android:id="@+id/edit_card_btn"
+                android:layout_width="0dp"
+                android:layout_height="65dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:background="@drawable/btn_purple"
+                android:text="@string/edit"
+                android:textAllCaps="false"
+                android:fontFamily="@font/geometria_medium"
+                android:textColor="#fff"
+                android:layout_marginBottom="50dp"
+                android:layout_marginHorizontal="50dp"
+                android:textSize="17sp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

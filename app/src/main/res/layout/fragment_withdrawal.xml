@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background">
+
+    <TextView
+        android:id="@+id/withdrawal_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp"
+        android:text="@string/withdrawal"
+        android:textAllCaps="false"
+        android:textColor="#fff"
+        android:fontFamily="@font/geometria_medium"
+        android:textSize="19sp"
+        android:gravity="center"/>
+
+    <ImageView
+        android:id="@+id/back_arrow_image_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/card_layout"
+        app:layout_constraintDimensionRatio="H, 1:1"
+        android:src="@drawable/ic_back_vector"
+        android:scaleType="fitCenter"
+        android:padding="16dp"
+        android:layout_marginVertical="16dp"
+        android:layout_marginStart="8dp"
+        android:contentDescription="@string/transfer"/>
+
+    <ImageView
+        android:id="@+id/plus_image_view"
+        android:layout_width="0dp"
+        android:layout_height="22.4dp"
+        app:layout_constraintTop_toTopOf="@id/withdrawal_text_view"
+        app:layout_constraintBottom_toBottomOf="@id/withdrawal_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/ic_plus"
+        android:contentDescription="@string/my_cards"/>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/card_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/withdrawal_text_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/card_top_radius_light"
+        android:fillViewport="true"
+        android:fitsSystemWindows="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/accessible_text_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="42dp"
+                android:text="@string/accessible"
+                android:gravity="center"
+                android:fontFamily="@font/geometria_actual"
+                android:textColor="#3B3A39"
+                android:textSize="15sp"/>
+
+            <TextView
+                android:id="@+id/accessible_number_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/accessible_text_view"
+                android:layout_marginTop="7dp"
+                android:textColor="#3B3A39"
+                android:gravity="center"
+                android:fontFamily="@font/geometria_bold"
+                android:textSize="27sp"
+                android:text="@string/summary"/>
+
+            <TextView
+                android:id="@+id/sum_text_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/accessible_number_text_view"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="37dp"
+                android:layout_marginTop="37.5dp"
+                android:fontFamily="@font/geometria_actual"
+                android:text="@string/sum"
+                android:textColor="#3B3A39"
+                android:textSize="15sp"/>
+
+            <EditText
+                android:id="@+id/sum_edit_text"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                app:layout_constraintTop_toBottomOf="@+id/sum_text_view"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:background="@drawable/edit_text_locked"
+                android:layout_marginTop="13dp"
+                android:layout_marginStart="28dp"
+                android:layout_marginEnd="28dp"
+                android:paddingStart="22dp"
+                android:paddingEnd="22dp"
+                android:fontFamily="@font/geometria_medium"
+                android:textSize="19sp"
+                android:textColor="#3B3A39"
+                android:autofillHints="@string/password"
+                android:inputType="numberDecimal"
+                android:hint="@string/zero"
+                android:textColorHint="#DBDCEA"
+                android:maxLines="1"/>
+
+            <TextView
+                android:id="@+id/choose_card_text_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/sum_edit_text"
+                app:layout_constraintStart_toStartOf="@id/sum_text_view"
+                android:layout_marginTop="31dp"
+                android:fontFamily="@font/geometria_actual"
+                android:text="@string/choose_a_card"
+                android:textColor="#3B3A39"
+                android:textSize="15sp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/card_list_recycler_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/choose_card_text_view"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
+                android:id="@+id/withdraw_btn"
+                android:layout_width="0dp"
+                android:layout_height="65dp"
+                app:layout_constraintTop_toBottomOf="@+id/card_list_recycler_view"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:background="@drawable/btn_purple"
+                android:text="@string/withdraw"
+                android:textAllCaps="false"
+                android:fontFamily="@font/geometria_medium"
+                android:textColor="#fff"
+                android:layout_marginStart="50dp"
+                android:layout_marginEnd="50dp"
+                android:layout_marginBottom="50dp"
+                android:layout_marginTop="60dp"
+                android:textSize="17sp"
+                android:elevation="2dp"
+                app:spinning_bar_color="@color/colorWhite"
+                app:spinning_bar_padding="12dp"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
