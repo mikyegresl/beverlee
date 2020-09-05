@@ -39,9 +39,6 @@ import uz.alex.its.beverlee.model.Country;
 import uz.alex.its.beverlee.model.DeviceDisplay;
 import uz.alex.its.beverlee.view.adapters.CountryAdapter;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class SignUpFragment extends Fragment {
     private EditText fullNameEditText;
     private AutoCompleteTextView phoneField;

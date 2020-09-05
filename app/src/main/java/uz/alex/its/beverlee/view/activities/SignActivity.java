@@ -2,9 +2,7 @@ package uz.alex.its.beverlee.view.activities;
 
 import android.content.Context;
 import android.os.Bundle;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -12,7 +10,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-
 import uz.alex.its.beverlee.R;
 
 public class SignActivity extends AppCompatActivity {
