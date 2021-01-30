@@ -18,10 +18,9 @@ import uz.alex.its.beverlee.model.Contact;
 import uz.alex.its.beverlee.view.interfaces.ContactCallback;
 
 public class ContactListVerticalAdapter extends RecyclerView.Adapter<ContactListVerticalAdapter.ContactVerticalViewHolder> {
-    private static final String TAG = ContactListVerticalAdapter.class.toString();
     private List<Contact> contactList;
-    private Context context;
-    private ContactCallback contactCallback;
+    private final Context context;
+    private final ContactCallback contactCallback;
 
     public ContactListVerticalAdapter(@NonNull final Context context, @NonNull final ContactCallback contactCallback) {
         this.context = context;
@@ -83,8 +82,10 @@ public class ContactListVerticalAdapter extends RecyclerView.Adapter<ContactList
 
         void bind(final Contact contact, final ContactCallback contactCallback) {
             itemView.setOnClickListener(v -> {
-                contactCallback.onContactSelect(contact, this);
+                contactCallback.onVerticalContactSelected(contact, this);
             });
         }
     }
+
+    private static final String TAG = ContactListVerticalAdapter.class.toString();
 }

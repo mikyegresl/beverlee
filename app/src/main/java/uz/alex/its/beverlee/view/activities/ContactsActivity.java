@@ -19,9 +19,6 @@ public class ContactsActivity extends BaseActivity {
         viewModel.getContactList().observe(this, contactList -> {
             //updateUI
         });
-
-//        final Fragment contactsFragment = new ContactsFragment(contactList, favContactList, this);
-//        getSupportFragmentManager().beginTransaction().add(R.id.contacts_fragment_container, contactsFragment);
     }
 
     @Override

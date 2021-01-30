@@ -55,7 +55,7 @@ public class CalendarFragment extends Fragment {
 
         backArrowImageView.setOnClickListener(v -> {
             if (getActivity() != null) {
-                getActivity().getSupportFragmentManager().popBackStack();
+                getActivity().onBackPressed();
             }
         });
 

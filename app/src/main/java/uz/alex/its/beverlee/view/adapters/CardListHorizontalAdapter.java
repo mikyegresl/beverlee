@@ -18,9 +18,8 @@ import uz.alex.its.beverlee.R;
 import uz.alex.its.beverlee.model.Card;
 
 public class CardListHorizontalAdapter extends RecyclerView.Adapter<CardListHorizontalAdapter.CardHorizontalViewHolder> {
-    private static final String TAG = CardListHorizontalAdapter.class.toString();
     private List<Card> cardList;
-    private Context context;
+    private final Context context;
 
     public CardListHorizontalAdapter(@NonNull final Context context) {
         this.context = context;
@@ -80,4 +79,6 @@ public class CardListHorizontalAdapter extends RecyclerView.Adapter<CardListHori
             checkImageView = itemView.findViewById(R.id.check_image_view);
         }
     }
+
+    private static final String TAG = CardListHorizontalAdapter.class.toString();
 }

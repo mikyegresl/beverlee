@@ -21,6 +21,13 @@
         android:layout_height="76dp"
         android:layout_gravity="bottom"/>
 
+    <include layout="@layout/bottom_sheet_contacts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        app:behavior_hideable="true"/>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floating_btn"
         android:layout_width="wrap_content"
@@ -33,6 +40,7 @@
         android:backgroundTint="#770C94"
         app:elevation="2dp"
         app:fabCustomSize="70dp"
-        app:maxImageSize="32dp" />
+        app:maxImageSize="32dp"
+        android:contentDescription="@string/fab_transformation_scrim_behavior"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

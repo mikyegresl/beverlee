@@ -1,6 +1,8 @@
 package uz.alex.its.beverlee.view.fragments;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,16 +20,22 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.squareup.picasso.Picasso;
 
+import uz.alex.its.beverlee.Constants;
 import uz.alex.its.beverlee.R;
+
+import static android.app.Activity.RESULT_OK;
 
 public class ProfileFragment extends Fragment {
     private static final String TAG = ProfileFragment.class.toString();
 
     private ImageView backArrowImageView;
     private ImageView avatarImageView;
+    private ImageView changeProfilePhotoImageView;
     private Button editBtn;
     private ConstraintLayout parentLayout;
 
@@ -64,6 +72,7 @@ public class ProfileFragment extends Fragment {
 
         backArrowImageView = root.findViewById(R.id.back_arrow_image_view);
         avatarImageView = root.findViewById(R.id.profile_photo_image_view);
+        changeProfilePhotoImageView = root.findViewById(R.id.change_profile_photo_image_view);
         editBtn = root.findViewById(R.id.edit_btn);
         parentLayout = root.findViewById(R.id.parent_layout);
 
@@ -128,6 +137,14 @@ public class ProfileFragment extends Fragment {
 
         avatarImageView.setOnClickListener(v -> {
 
+        });
+
+        changeProfilePhotoImageView.setOnClickListener(v -> {
+            final Intent pickImageIntent = new Intent();
+            pickImageIntent.setAction(Intent.ACTION_GET_CONTENT);
+            pickImageIntent.setType("image/*");
+//            pickImageIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivityForResult(Intent.createChooser(pickImageIntent, getString(R.string.pick_image)), Constants.INTENT_PICK_IMAGE);
         });
 
         bottomSheetPersonalData.setOnClickListener(v -> {
@@ -205,5 +222,29 @@ public class ProfileFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.i(TAG, "onResume: ");
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == Constants.INTENT_PICK_IMAGE) {
+                if (data == null) {
+                    Log.e(TAG, "onActivityResult(): data is NULL");
+                    Toast.makeText(getContext(), "Ошибка: пустой ответ", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                final Uri selectedImageURI = data.getData();
+                Log.i(TAG, "onActivityResult(): data=" + selectedImageURI);
+                Picasso.get()
+                        .load(selectedImageURI)
+                        .noPlaceholder()
+                        .fit()
+                        .centerInside()
+                        .rotate(90)
+                        .into(avatarImageView);
+            }
+        }
     }
 }

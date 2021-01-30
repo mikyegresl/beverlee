@@ -33,11 +33,11 @@ import java.util.List;
 import uz.alex.its.beverlee.R;
 import uz.alex.its.beverlee.model.Contact;
 import uz.alex.its.beverlee.view.activities.OperationsContainerActivity;
+import uz.alex.its.beverlee.view.adapters.ContactListHorizontalAdapter;
 import uz.alex.its.beverlee.view.adapters.ContactListVerticalAdapter;
 import uz.alex.its.beverlee.view.interfaces.ContactCallback;
 
 public class ContactsFragment extends Fragment implements ContactCallback {
-    private static final String TAG = ContactsFragment.class.toString();
     private Context context;
 
     private ImageView plusImageView;
@@ -52,9 +52,9 @@ public class ContactsFragment extends Fragment implements ContactCallback {
     private List<Contact> favContactList;
 
     private FloatingActionButton fab;
-    private BottomNavigationView bottomNavigationView;
 
     /*bottomSheet for contactList*/
+    private BottomNavigationView bottomNavigationView;
     private LinearLayout bottomSheetContacts;
     private TextView bottomSheetContactsTransfer;
     private TextView bottomSheetAddToFavs;
@@ -102,8 +102,6 @@ public class ContactsFragment extends Fragment implements ContactCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.fragment_contacts, container, false);
-
-        Log.i(TAG, "onCreateView(): ");
 
         plusImageView = root.findViewById(R.id.plus_image_view);
         radioGroup = root.findViewById(R.id.radio_group);
@@ -202,7 +200,7 @@ public class ContactsFragment extends Fragment implements ContactCallback {
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-
+                return;
             }
         };
 
@@ -235,7 +233,7 @@ public class ContactsFragment extends Fragment implements ContactCallback {
     }
 
     @Override
-    public void onContactSelect(final Contact contact, ContactListVerticalAdapter.ContactVerticalViewHolder holder) {
+    public void onVerticalContactSelected(final Contact contact, ContactListVerticalAdapter.ContactVerticalViewHolder holder) {
         if (!contactSelected) {
             contactSelected = true;
             selectedHolder = holder;
@@ -289,6 +287,11 @@ public class ContactsFragment extends Fragment implements ContactCallback {
         }
     }
 
+    @Override
+    public void onHorizontalContactSelected(Contact contact, ContactListHorizontalAdapter.ContactHorizontalViewHolder holder) {
+        //do nothing
+    }
+
     private void revertItems() {
         contactSelected = false;
         if (selectedHolder != null) {
@@ -322,4 +325,6 @@ public class ContactsFragment extends Fragment implements ContactCallback {
             favsSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         }
     }
+
+    private static final String TAG = ContactsFragment.class.toString();
 }

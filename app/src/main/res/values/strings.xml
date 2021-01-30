@@ -137,6 +137,7 @@
     <string name="profile_name">Людмила Плюшкина</string>
     <string name="identifier">Идентификатор: 21</string>
     <string name="club_number">Клубный номер: 305</string>
+    <string name="pick_image">Выберите фото</string>
     <!-- personal data -->
     <string name="personal_data">Персональные данные</string>
     <string name="first_name">Полное имя</string>

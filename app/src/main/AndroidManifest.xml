@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="uz.alex.its.beverlee">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="uz.alex.its.beverlee">
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"  />
 
     <application
         android:allowBackup="true"
@@ -54,5 +55,4 @@
             android:name=".view.activities.SplashActivity"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
-
 </manifest>

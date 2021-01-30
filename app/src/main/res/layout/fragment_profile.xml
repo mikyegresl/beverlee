@@ -68,6 +68,7 @@
             android:background="@drawable/square_purple"
             android:src="@drawable/ic_crown_big"
             android:paddingHorizontal="36dp"
+            android:scaleType="fitCenter"
             android:contentDescription="@string/profile"/>
 
         <ImageView

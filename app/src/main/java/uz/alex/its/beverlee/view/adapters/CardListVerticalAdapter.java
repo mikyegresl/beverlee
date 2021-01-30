@@ -16,8 +16,7 @@ import uz.alex.its.beverlee.model.Card;
 import uz.alex.its.beverlee.view.interfaces.CardCallback;
 
 public class CardListVerticalAdapter extends RecyclerView.Adapter<CardListVerticalAdapter.CardVerticalViewHolder> {
-    private static final String TAG = CardListVerticalAdapter.class.toString();
-    private Context context;
+    private final Context context;
     private List<Card> cardList;
     private CardCallback cardCallback;
 
@@ -93,4 +92,6 @@ public class CardListVerticalAdapter extends RecyclerView.Adapter<CardListVertic
             });
         }
     }
+
+    private static final String TAG = CardListVerticalAdapter.class.toString();
 }

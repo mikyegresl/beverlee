@@ -23,6 +23,16 @@
         android:layout_marginStart="22dp"
         android:layout_marginEnd="6dp"/>
 
+    <ImageView
+        android:id="@+id/check_image_view"
+        android:layout_width="23dp"
+        android:layout_height="23dp"
+        android:background="@drawable/ic_check"
+        app:layout_constraintEnd_toEndOf="@id/contact_avatar_image_view"
+        app:layout_constraintBottom_toBottomOf="@id/contact_avatar_image_view"
+        android:elevation="8dp"
+        android:contentDescription="@string/card"/>
+
     <TextView
         android:id="@+id/contact_name_text_view"
         android:layout_width="0dp"

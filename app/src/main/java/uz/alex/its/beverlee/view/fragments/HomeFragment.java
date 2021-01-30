@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,8 +19,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -27,12 +32,14 @@ import java.util.List;
 
 import uz.alex.its.beverlee.R;
 import uz.alex.its.beverlee.model.Contact;
+import uz.alex.its.beverlee.view.activities.MonitoringActivity;
 import uz.alex.its.beverlee.view.activities.OperationsContainerActivity;
 import uz.alex.its.beverlee.view.activities.ProfileActivity;
 import uz.alex.its.beverlee.view.adapters.ContactListHorizontalAdapter;
+import uz.alex.its.beverlee.view.adapters.ContactListVerticalAdapter;
+import uz.alex.its.beverlee.view.interfaces.ContactCallback;
 
-public class HomeFragment extends Fragment {
-    private static final String TAG = HomeFragment.class.toString();
+public class HomeFragment extends Fragment implements ContactCallback {
     private Context context;
 
     private TextView summaryTextView;
@@ -45,7 +52,19 @@ public class HomeFragment extends Fragment {
 
     private final List<Contact> contactList = new ArrayList<>();
 
+    private View cardProfit;
+
     private FloatingActionButton fab;
+
+    /*bottomSheet for contactList*/
+    private BottomNavigationView bottomNavigationView;
+    private LinearLayout bottomSheetContacts;
+    private TextView bottomSheetContactsTransfer;
+    private TextView bottomSheetAddToFavs;
+    private TextView bottomSheetDelete;
+    private BottomSheetBehavior contactsSheetBehavior;
+    private ContactListHorizontalAdapter.ContactHorizontalViewHolder selectedHolder = null;
+    private boolean contactSelected = false;
 
     public HomeFragment() {
 
@@ -84,9 +103,10 @@ public class HomeFragment extends Fragment {
         bellImageView = root.findViewById(R.id.bell_image_view);
         debitBtn = root.findViewById(R.id.debit_btn);
         withdrawBtn = root.findViewById(R.id.withdraw_btn);
+        cardProfit = root.findViewById(R.id.card_profit);
 
         final RecyclerView contactRecyclerView = root.findViewById(R.id.contact_recycler_view);
-        final ContactListHorizontalAdapter adapter = new ContactListHorizontalAdapter(context);
+        final ContactListHorizontalAdapter adapter = new ContactListHorizontalAdapter(context, this);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(context);
 
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
@@ -99,6 +119,16 @@ public class HomeFragment extends Fragment {
             fab = getActivity().findViewById(R.id.floating_btn);
         }
 
+        /* bottomSheet */
+        bottomNavigationView = getActivity().findViewById(R.id.bottom_nav);
+        bottomSheetContacts = getActivity().findViewById(R.id.bottom_sheet_contacts);
+        bottomSheetContactsTransfer = getActivity().findViewById(R.id.contacts_transfer);
+        bottomSheetAddToFavs = getActivity().findViewById(R.id.add_to_favorites);
+        bottomSheetDelete = getActivity().findViewById(R.id.delete_contact);
+
+        contactsSheetBehavior = BottomSheetBehavior.from(bottomSheetContacts);
+        contactsSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
         return root;
     }
 
@@ -110,6 +140,10 @@ public class HomeFragment extends Fragment {
         String profitSummaryText = "<font color=#FFFFFF>+ 1200,</font><font color=#888785>00</font> <font color=#FFFFFF>$</font>";
         summaryTextView.setText(Html.fromHtml(summaryText));
         profitSummaryTextView.setText(Html.fromHtml(profitSummaryText));
+
+        cardProfit.setOnClickListener(v -> {
+            startActivity(new Intent(getActivity(), MonitoringActivity.class));
+        });
 
         fab.setOnClickListener(v -> {
             final Intent addCardIntent = new Intent(getActivity(), OperationsContainerActivity.class);
@@ -149,6 +183,68 @@ public class HomeFragment extends Fragment {
             startActivity(withdrawIntent);
         });
 
+        BottomSheetBehavior.BottomSheetCallback callback = new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_EXPANDED: {
+                        bottomNavigationView.setVisibility(View.INVISIBLE);
+                        fab.setVisibility(View.INVISIBLE);
+                        break;
+                    }
+                    case BottomSheetBehavior.STATE_SETTLING: {
+                        if (!contactSelected) {
+                            bottomNavigationView.setVisibility(View.VISIBLE);
+                            fab.setVisibility(View.VISIBLE);
+                        }
+                        break;
+                    }
+                }
+            }
 
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                return;
+            }
+        };
+
+        contactsSheetBehavior.addBottomSheetCallback(callback);
+
+        bottomSheetContactsTransfer.setOnClickListener(v -> {
+            final Intent transferIntent = new Intent(getActivity(), OperationsContainerActivity.class);
+            transferIntent.putExtra(OperationsContainerActivity.FRAGMENT_FLAG, OperationsContainerActivity.TRANSFER_FRAGMENT);
+            startActivity(transferIntent);
+        });
+
+        bottomSheetAddToFavs.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Добавлено в избранные", Toast.LENGTH_SHORT).show();
+        });
+
+        bottomSheetDelete.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Контакт удален", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private static final String TAG = HomeFragment.class.toString();
+
+    @Override
+    public void onHorizontalContactSelected(Contact contact, ContactListHorizontalAdapter.ContactHorizontalViewHolder holder) {
+        if (!contactSelected) {
+            contactSelected = true;
+            selectedHolder = holder;
+            selectedHolder.checkImageView.setVisibility(View.VISIBLE);
+            contactsSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            return;
+        }
+        final ImageView selectedCheckImageView = selectedHolder.checkImageView;
+        selectedCheckImageView.setVisibility(View.INVISIBLE);
+        contactsSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        contactSelected = false;
+        selectedHolder = null;
+    }
+
+    @Override
+    public void onVerticalContactSelected(Contact contact, ContactListVerticalAdapter.ContactVerticalViewHolder holder) {
+        //do nothing
     }
 }
