@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/home_navigation"
+    app:startDestination="@id/homeFragment">
+
+    <activity
+        android:id="@+id/splashActivity"
+        android:name="uz.alex.its.beverlee.view.activities.SplashActivity"
+        android:label="activity_splash"
+        tools:layout="@layout/activity_splash" />
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="uz.alex.its.beverlee.view.fragments.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_notificationsFragment"
+            app:destination="@id/notificationsFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_debitFragment"
+            app:destination="@id/debitFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_withdrawalFragment"
+            app:destination="@id/withdrawalFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_newsFragment"
+            app:destination="@id/newsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="uz.alex.its.beverlee.view.fragments.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/debitFragment"
+        android:name="uz.alex.its.beverlee.view.fragments.ReplenishFragment"
+        android:label="fragment_debit"
+        tools:layout="@layout/fragment_replenish" />
+    <fragment
+        android:id="@+id/notificationsFragment"
+        android:name="uz.alex.its.beverlee.view.fragments.NotificationsFragment"
+        android:label="fragment_notifications"
+        tools:layout="@layout/fragment_notifications" />
+    <fragment
+        android:id="@+id/withdrawalFragment"
+        android:name="uz.alex.its.beverlee.view.fragments.WithdrawalFragment"
+        android:label="fragment_withdrawal"
+        tools:layout="@layout/fragment_withdrawal" />
+    <fragment
+        android:id="@+id/newsFragment"
+        android:name="uz.alex.its.beverlee.view.fragments.NewsFragment"
+        android:label="NewsFragment"
+        tools:layout="@layout/fragment_news">
+        <action
+            android:id="@+id/action_newsFragment_to_newsDataFragment"
+            app:destination="@id/newsDataFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/newsDataFragment"
+        android:name="uz.alex.its.beverlee.view.fragments.NewsDataFragment"
+        android:label="NewsDataFragment"
+        tools:layout="@layout/fragment_news_data">
+    <argument
+        android:name="news_id"
+        app:argType="long"
+        android:defaultValue="0L"/>
+    <argument
+        android:name="title"
+        app:argType="string"
+        app:nullable="true"
+        android:defaultValue="null"/>
+    <argument
+        android:name="description"
+        app:argType="string"
+        app:nullable="true"
+        android:defaultValue="null"/>
+    <argument
+        android:name="photo_url"
+        app:argType="string"
+        app:nullable="true"
+        android:defaultValue="null" />
+    <argument
+        android:name="created_at"
+        app:argType="long"
+        android:defaultValue="0L"/>
+    </fragment>
+</navigation>

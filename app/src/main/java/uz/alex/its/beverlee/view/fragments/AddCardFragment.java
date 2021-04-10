@@ -1,6 +1,5 @@
 package uz.alex.its.beverlee.view.fragments;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -10,12 +9,10 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
@@ -65,7 +62,7 @@ public class AddCardFragment extends Fragment {
         parentLayout = root;
         backArrowImageView = root.findViewById(R.id.back_arrow_image_view);
         cardNumberEditText = root.findViewById(R.id.card_number_edit_text);
-        fullnameEditText = root.findViewById(R.id.full_name_edit_text);
+        fullnameEditText = root.findViewById(R.id.first_name_edit_text);
         monthYearEditText = root.findViewById(R.id.month_year_edit_text);
         cardNameEditText = root.findViewById(R.id.card_name_edit_text);
         addCardBtn = root.findViewById(R.id.add_card_btn);

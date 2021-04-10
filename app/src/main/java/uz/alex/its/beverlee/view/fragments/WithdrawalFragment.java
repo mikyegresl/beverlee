@@ -1,67 +1,47 @@
 package uz.alex.its.beverlee.view.fragments;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.drawable.AnimationDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import android.text.Editable;
-import android.text.Html;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
-import br.com.simplepass.loadingbutton.customViews.OnAnimationEndListener;
 import uz.alex.its.beverlee.R;
-import uz.alex.its.beverlee.model.Card;
-import uz.alex.its.beverlee.model.Contact;
+import uz.alex.its.beverlee.model.transaction.Card;
 import uz.alex.its.beverlee.view.AnimateBtnAsyncTask;
-import uz.alex.its.beverlee.view.adapters.CardListHorizontalAdapter;
-import uz.alex.its.beverlee.view.adapters.ContactListHorizontalAdapter;
-import uz.alex.its.beverlee.view.views.CustomProgressBar;
+import uz.alex.its.beverlee.view.UiUtils;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class WithdrawalFragment extends Fragment {
-    private static final String TAG = WithdrawalFragment.class.toString();
     private Activity activity;
     private Context context;
 
     private View activityRootView;
-    private RelativeLayout creditCard;
     private ImageView backArrowImageView;
-    private ImageView plusImageView;
-    private EditText sumEditText;
-    private TextView accessibleSumTextView;
+    private TextView recipientDataTextView;
+    private EditText fullNameEditText;
+    private EditText phoneEditText;
+    private AutoCompleteTextView countryAutoCompleteTextView;
+    private EditText cityEditText;
+    private EditText amountEditText;
+    private TextView amountWithCommissionTextView;
     private CircularProgressButton withdrawBtn;
 
     private final List<Card> cardList = new ArrayList<>();
@@ -81,10 +61,10 @@ public class WithdrawalFragment extends Fragment {
             activity = getActivity();
         }
 
-        cardList.add(new Card(true, "6346 5785 1234 9567", "01/20","Моника Белучи"));
-        cardList.add(new Card(true, "6346 5785 1234 9567", "01/20","Галь Гадот"));
-        cardList.add(new Card(true, "6346 5785 1234 9567", "01/20","Ирина Шейк"));
-        cardList.add(new Card(true, "6346 5785 1234 9567", "01/20","Анна Серябкина"));
+        cardList.add(new Card(1, "6346 5785 1234 9567", "01/20","Моника Белучи"));
+        cardList.add(new Card(1, "6346 5785 1234 9567", "01/20","Галь Гадот"));
+        cardList.add(new Card(1, "6346 5785 1234 9567", "01/20","Ирина Шейк"));
+        cardList.add(new Card(1, "6346 5785 1234 9567", "01/20","Анна Серябкина"));
     }
 
     @Override
@@ -94,24 +74,16 @@ public class WithdrawalFragment extends Fragment {
         if (getActivity() != null) {
             activityRootView = getActivity().findViewById(R.id.activity_view_root);
         }
-        creditCard = root.findViewById(R.id.credit_card);
         backArrowImageView = root.findViewById(R.id.back_arrow_image_view);
-        plusImageView = root.findViewById(R.id.plus_image_view);
-        sumEditText = root.findViewById(R.id.sum_edit_text);
-        accessibleSumTextView = root.findViewById(R.id.accessible_number_text_view);
+        recipientDataTextView = root.findViewById(R.id.recipient_data_text_view);
+        fullNameEditText = root.findViewById(R.id.full_name_edit_text);
+        phoneEditText = root.findViewById(R.id.phone_edit_text);
+        countryAutoCompleteTextView = root.findViewById(R.id.country_spinner);
+        cityEditText = root.findViewById(R.id.city_edit_text);
+        amountEditText = root.findViewById(R.id.amount_edit_text);
+        amountWithCommissionTextView = root.findViewById(R.id.amount_with_commission_text_view);
         withdrawBtn = root.findViewById(R.id.withdraw_btn);
-        nestedScrollView = root.findViewById(R.id.card_layout);
-
-        final RecyclerView cardRecyclerView = root.findViewById(R.id.card_list_recycler_view);
-        final CardListHorizontalAdapter adapter = new CardListHorizontalAdapter(context);
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(context);
-
-        layoutManager.setOrientation(RecyclerView.HORIZONTAL);
-        cardRecyclerView.setHasFixedSize(false);
-        cardRecyclerView.setLayoutManager(layoutManager);
-        cardRecyclerView.setAdapter(adapter);
-
-        adapter.setCardList(cardList);
+        nestedScrollView = root.findViewById(R.id.scroll_layout);
 
         return root;
     }
@@ -120,8 +92,8 @@ public class WithdrawalFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        String summaryText = "<font color=#3B3A39>$ 23 650,</font><font color=#BABAB9>92</font>";
-        accessibleSumTextView.setText(Html.fromHtml(summaryText));
+        recipientDataTextView.setText(getString(R.string.recipient_data, "Western Union"));
+        amountWithCommissionTextView.setText(getString(R.string.amount_with_commission, 0));
 
         backArrowImageView.setOnClickListener(v -> {
             if (activity.getCurrentFocus() == null) {
@@ -133,34 +105,14 @@ public class WithdrawalFragment extends Fragment {
             activity.getCurrentFocus().clearFocus();
         });
 
-        plusImageView.setOnClickListener(v -> {
-            if (getActivity() != null) {
-                final Fragment addCardFragment = new AddCardFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).add(R.id.operations_fragment_container, addCardFragment).commit();
-            }
-        });
-
-        sumEditText.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) {
-                nestedScrollView.postDelayed(() -> {
-                    nestedScrollView.smoothScrollTo(0, withdrawBtn.getId());
-                }, 100);
-
-                sumEditText.setBackgroundResource(R.drawable.edit_text_active);
-                sumEditText.setHint("");
-                return;
-            }
-            if (sumEditText.getText().length() > 0) {
-                sumEditText.setBackgroundResource(R.drawable.edit_text_filled);
-                sumEditText.setHint("");
-                return;
-            }
-            sumEditText.setBackgroundResource(R.drawable.edit_text_locked);
-            sumEditText.setHint(R.string.zero);
+        amountEditText.setOnFocusChangeListener((v, hasFocus) -> {
+            UiUtils.setFocusChange(amountEditText, hasFocus, R.string.zero);
         });
 
         withdrawBtn.setOnClickListener(v -> {
             new AnimateBtnAsyncTask(getActivity(), withdrawBtn).execute();
         });
     }
+
+    private static final String TAG = WithdrawalFragment.class.toString();
 }

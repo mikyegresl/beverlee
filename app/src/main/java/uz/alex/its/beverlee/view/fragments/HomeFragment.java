@@ -1,15 +1,20 @@
 package uz.alex.its.beverlee.view.fragments;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import android.text.Html;
 import android.util.Log;
@@ -27,22 +32,26 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import uz.alex.its.beverlee.R;
-import uz.alex.its.beverlee.model.Contact;
+import uz.alex.its.beverlee.model.actor.Contact;
+import uz.alex.its.beverlee.storage.SharedPrefs;
+import uz.alex.its.beverlee.utils.Constants;
+import uz.alex.its.beverlee.utils.PermissionManager;
 import uz.alex.its.beverlee.view.activities.MonitoringActivity;
 import uz.alex.its.beverlee.view.activities.OperationsContainerActivity;
 import uz.alex.its.beverlee.view.activities.ProfileActivity;
 import uz.alex.its.beverlee.view.adapters.ContactListHorizontalAdapter;
 import uz.alex.its.beverlee.view.adapters.ContactListVerticalAdapter;
 import uz.alex.its.beverlee.view.interfaces.ContactCallback;
+import uz.alex.its.beverlee.viewmodel.ContactsViewModel;
+import uz.alex.its.beverlee.viewmodel.TransactionViewModel;
+import uz.alex.its.beverlee.viewmodel_factory.ContactsViewModelFactory;
+import uz.alex.its.beverlee.viewmodel_factory.TransactionViewModelFactory;
 
 public class HomeFragment extends Fragment implements ContactCallback {
     private Context context;
 
-    private TextView summaryTextView;
+    private TextView currentBalanceTextView;
     private TextView profitSummaryTextView;
     private EditText searchFieldEditText;
     private ImageView crownImageView;
@@ -50,21 +59,31 @@ public class HomeFragment extends Fragment implements ContactCallback {
     private Button debitBtn;
     private Button withdrawBtn;
 
-    private final List<Contact> contactList = new ArrayList<>();
-
     private View cardProfit;
 
     private FloatingActionButton fab;
 
-    /*bottomSheet for contactList*/
+    /* bottomSheet for contactList */
     private BottomNavigationView bottomNavigationView;
     private LinearLayout bottomSheetContacts;
     private TextView bottomSheetContactsTransfer;
     private TextView bottomSheetAddToFavs;
     private TextView bottomSheetDelete;
     private BottomSheetBehavior contactsSheetBehavior;
+
+    /* contact list */
+    private RecyclerView contactListRecyclerView;
+    private ContactListHorizontalAdapter adapter;
+
+    /* selected contacts */
     private ContactListHorizontalAdapter.ContactHorizontalViewHolder selectedHolder = null;
     private boolean contactSelected = false;
+
+    /* contacts permission */
+    private static final String[] permissionArray = { Manifest.permission.READ_CONTACTS };
+
+    /* news */
+    private CardView newsCardView;
 
     public HomeFragment() {
 
@@ -73,61 +92,55 @@ public class HomeFragment extends Fragment implements ContactCallback {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getActivity() != null) {
             context = getActivity().getApplicationContext();
         }
         if (getArguments() != null) {
             Log.i(TAG, "onCreate: " + getArguments().getSerializable("interface"));
         }
-
-        contactList.add(new Contact("Георгий Павлович"));
-        contactList.add(new Contact("Юрий Александрович"));
-        contactList.add(new Contact("Василий Петрович"));
-        contactList.add(new Contact("Андрей Ололоевич"));
-        contactList.add(new Contact("Федор Михайлович"));
-        contactList.add(new Contact("Владимир Владимирович"));
-        contactList.add(new Contact("Александр Сергеевич"));
-        contactList.add(new Contact("Алексей"));
-        contactList.add(new Contact("Вадим"));
-        contactList.add(new Contact("Никита"));
+        Log.i(TAG, "onCreate(): bearerToken=" + SharedPrefs.getInstance(context).getString(Constants.BEARER_TOKEN));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.fragment_home, container, false);
 
-        summaryTextView = root.findViewById(R.id.summary_text_view);
+        currentBalanceTextView = root.findViewById(R.id.current_balance_text_view);
         profitSummaryTextView = root.findViewById(R.id.profit_summary_text_view);
         searchFieldEditText = root.findViewById(R.id.home_search_edit_text);
         crownImageView = root.findViewById(R.id.crown_image_view);
         bellImageView = root.findViewById(R.id.bell_image_view);
-        debitBtn = root.findViewById(R.id.debit_btn);
+        debitBtn = root.findViewById(R.id.replenish_btn);
         withdrawBtn = root.findViewById(R.id.withdraw_btn);
         cardProfit = root.findViewById(R.id.card_profit);
+        contactListRecyclerView = root.findViewById(R.id.contact_recycler_view);
 
-        final RecyclerView contactRecyclerView = root.findViewById(R.id.contact_recycler_view);
-        final ContactListHorizontalAdapter adapter = new ContactListHorizontalAdapter(context, this);
+        /* news */
+        newsCardView = root.findViewById(R.id.news_card_view);
+
+        adapter = new ContactListHorizontalAdapter(context, this);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(context);
-
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
-        contactRecyclerView.setHasFixedSize(false);
-        contactRecyclerView.setLayoutManager(layoutManager);
-        contactRecyclerView.setAdapter(adapter);
-        adapter.setContactList(contactList);
+
+        contactListRecyclerView.setLayoutManager(layoutManager);
+        contactListRecyclerView.setAdapter(adapter);
 
         if (getActivity() != null) {
             fab = getActivity().findViewById(R.id.floating_btn);
+            /* bottomSheet */
+            bottomNavigationView = getActivity().findViewById(R.id.bottom_nav);
+            bottomSheetContacts = getActivity().findViewById(R.id.bottom_sheet_contacts);
+            bottomSheetContactsTransfer = getActivity().findViewById(R.id.contacts_transfer);
+            bottomSheetAddToFavs = getActivity().findViewById(R.id.add_to_favorites);
+            bottomSheetDelete = getActivity().findViewById(R.id.delete_contact);
         }
-
-        /* bottomSheet */
-        bottomNavigationView = getActivity().findViewById(R.id.bottom_nav);
-        bottomSheetContacts = getActivity().findViewById(R.id.bottom_sheet_contacts);
-        bottomSheetContactsTransfer = getActivity().findViewById(R.id.contacts_transfer);
-        bottomSheetAddToFavs = getActivity().findViewById(R.id.add_to_favorites);
-        bottomSheetDelete = getActivity().findViewById(R.id.delete_contact);
+        bottomNavigationView.setVisibility(View.VISIBLE);
+        fab.setVisibility(View.VISIBLE);
 
         contactsSheetBehavior = BottomSheetBehavior.from(bottomSheetContacts);
         contactsSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
 
         return root;
     }
@@ -136,9 +149,7 @@ public class HomeFragment extends Fragment implements ContactCallback {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        String summaryText = "<font color=#FFFFFF>$ 23 650,</font><font color=#888785>92</font>";
         String profitSummaryText = "<font color=#FFFFFF>+ 1200,</font><font color=#888785>00</font> <font color=#FFFFFF>$</font>";
-        summaryTextView.setText(Html.fromHtml(summaryText));
         profitSummaryTextView.setText(Html.fromHtml(profitSummaryText));
 
         cardProfit.setOnClickListener(v -> {
@@ -190,15 +201,26 @@ public class HomeFragment extends Fragment implements ContactCallback {
                     case BottomSheetBehavior.STATE_EXPANDED: {
                         bottomNavigationView.setVisibility(View.INVISIBLE);
                         fab.setVisibility(View.INVISIBLE);
+                        Log.i(TAG, "onStateChanged(): expanded");
                         break;
                     }
                     case BottomSheetBehavior.STATE_SETTLING: {
                         if (!contactSelected) {
+                            Log.i(TAG, "onStateChanged(): trigger");
                             bottomNavigationView.setVisibility(View.VISIBLE);
                             fab.setVisibility(View.VISIBLE);
                         }
+                        Log.i(TAG, "onStateChanged(): hidden");
                         break;
                     }
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        break;
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        break;
+                    case BottomSheetBehavior.STATE_HALF_EXPANDED:
+                        break;
+                    case BottomSheetBehavior.STATE_HIDDEN:
+                        break;
                 }
             }
 
@@ -223,9 +245,40 @@ public class HomeFragment extends Fragment implements ContactCallback {
         bottomSheetDelete.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Контакт удален", Toast.LENGTH_SHORT).show();
         });
+
+        /* news */
+        newsCardView.setOnClickListener(v -> {
+            NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.action_homeFragment_to_newsFragment);
+        });
     }
 
-    private static final String TAG = HomeFragment.class.toString();
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        final ContactsViewModelFactory contactsFactory = new ContactsViewModelFactory(context);
+        final ContactsViewModel contactsViewModel = new ViewModelProvider(getViewModelStore(), contactsFactory).get(ContactsViewModel.class);
+
+        final TransactionViewModelFactory transactionFactory = new TransactionViewModelFactory(context);
+        final TransactionViewModel transactionViewModel = new ViewModelProvider(getViewModelStore(), transactionFactory).get(TransactionViewModel.class);
+
+        if (PermissionManager.getInstance().permissionsGranted(requireContext(), permissionArray, Constants.REQUEST_CODE_READ_CONTACTS)) {
+            contactsViewModel.loadContactList();
+        }
+
+        contactsViewModel.getContactList().observe(getViewLifecycleOwner(), contactList -> {
+            Log.i(TAG, "contactList: " + contactList);
+            adapter.setContactList(contactList);
+        });
+
+        transactionViewModel.fetchCurrentBalance();
+
+        transactionViewModel.getBalance().observe(getViewLifecycleOwner(), balance -> {
+            if (balance != null) {
+                currentBalanceTextView.setText(getString(R.string.current_balance, String.valueOf(balance.getBalance())));
+            }
+        });
+    }
 
     @Override
     public void onHorizontalContactSelected(Contact contact, ContactListHorizontalAdapter.ContactHorizontalViewHolder holder) {
@@ -237,14 +290,18 @@ public class HomeFragment extends Fragment implements ContactCallback {
             return;
         }
         final ImageView selectedCheckImageView = selectedHolder.checkImageView;
-        selectedCheckImageView.setVisibility(View.INVISIBLE);
-        contactsSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
         contactSelected = false;
         selectedHolder = null;
+
+        selectedCheckImageView.setVisibility(View.INVISIBLE);
+        contactsSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
     @Override
     public void onVerticalContactSelected(Contact contact, ContactListVerticalAdapter.ContactVerticalViewHolder holder) {
         //do nothing
     }
+
+    private static final String TAG = HomeFragment.class.toString();
 }

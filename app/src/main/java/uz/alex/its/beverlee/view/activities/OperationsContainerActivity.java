@@ -6,12 +6,11 @@ import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.inputmethod.InputMethodManager;
 
 import uz.alex.its.beverlee.R;
 import uz.alex.its.beverlee.view.fragments.AddCardFragment;
 import uz.alex.its.beverlee.view.fragments.CalendarFragment;
-import uz.alex.its.beverlee.view.fragments.DebitFragment;
+import uz.alex.its.beverlee.view.fragments.ReplenishFragment;
 import uz.alex.its.beverlee.view.fragments.EditCardFragment;
 import uz.alex.its.beverlee.view.fragments.NotificationSettingsFragment;
 import uz.alex.its.beverlee.view.fragments.NotificationsFragment;
@@ -49,7 +48,7 @@ public class OperationsContainerActivity extends AppCompatActivity {
                     break;
                 }
                 case DEBIT_FRAGMENT: {
-                    nextFragment = new DebitFragment();
+                    nextFragment = new ReplenishFragment();
                     break;
                 }
                 case WITHDRAWAL_FRAGMENT: {

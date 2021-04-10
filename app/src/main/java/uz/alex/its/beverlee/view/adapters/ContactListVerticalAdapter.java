@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import uz.alex.its.beverlee.R;
-import uz.alex.its.beverlee.model.Contact;
+import uz.alex.its.beverlee.model.actor.Contact;
 import uz.alex.its.beverlee.view.interfaces.ContactCallback;
 
 public class ContactListVerticalAdapter extends RecyclerView.Adapter<ContactListVerticalAdapter.ContactVerticalViewHolder> {

@@ -116,7 +116,7 @@
             android:textColor="@color/colorBlack"
             android:autofillHints="@string/password"
             android:inputType="numberDecimal"
-            android:hint="@string/input_code"
+            android:hint="@string/verification_code"
             android:textColorHint="#DBDCEA"/>
 
         <Button

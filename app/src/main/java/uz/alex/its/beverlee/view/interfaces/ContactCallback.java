@@ -1,6 +1,6 @@
 package uz.alex.its.beverlee.view.interfaces;
 
-import uz.alex.its.beverlee.model.Contact;
+import uz.alex.its.beverlee.model.actor.Contact;
 import uz.alex.its.beverlee.view.adapters.ContactListHorizontalAdapter;
 import uz.alex.its.beverlee.view.adapters.ContactListVerticalAdapter;
 

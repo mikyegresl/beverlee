@@ -12,9 +12,9 @@
         tools:layout="@layout/fragment_my_cards" />
     <fragment
         android:id="@+id/debitFragment"
-        android:name="uz.alex.its.beverlee.view.fragments.DebitFragment"
+        android:name="uz.alex.its.beverlee.view.fragments.ReplenishFragment"
         android:label="fragment_debit"
-        tools:layout="@layout/fragment_debit" />
+        tools:layout="@layout/fragment_replenish" />
     <fragment
         android:id="@+id/editCardFragment"
         android:name="uz.alex.its.beverlee.view.fragments.EditCardFragment"

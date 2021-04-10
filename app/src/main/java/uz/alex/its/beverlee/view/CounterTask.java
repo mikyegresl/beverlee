@@ -1,7 +1,6 @@
 package uz.alex.its.beverlee.view;
 
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
@@ -9,37 +8,47 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
+
 import java.lang.ref.WeakReference;
 import java.util.Locale;
 import uz.alex.its.beverlee.R;
 
 public class CounterTask extends AsyncTask<Void, Integer, Integer> {
-    private static final String TAG = CounterTask.class.toString();
     private WeakReference<Resources> resourcesRef;
-    private WeakReference<EditText> editTextRef;
     private WeakReference<TextView> textViewRef;
-    private WeakReference<Button> btnRef;
+    private WeakReference<Button> firstBtnRef;
+    private WeakReference<Button> secondBtnRef;
 
-    public CounterTask(@NonNull final Resources res, @NonNull final EditText editText, @NonNull final TextView textView, @NonNull final Button btn) {
+    public CounterTask(@NonNull final Resources res,
+                       @NonNull final TextView textView,
+                       @NonNull final Button firstBtn,
+                       @NonNull final Button secondBtn) {
         this.resourcesRef = new WeakReference<>(res);
-        this.editTextRef = new WeakReference<>(editText);
         this.textViewRef = new WeakReference<>(textView);
-        this.btnRef = new WeakReference<>(btn);
+        this.firstBtnRef = new WeakReference<>(firstBtn);
+        this.secondBtnRef = new WeakReference<>(secondBtn);
     }
 
     @Override
     protected void onPreExecute() {
         Log.i(TAG, "onPreExecute: ");
         super.onPreExecute();
-        editTextRef.get().setEnabled(false);
-        btnRef.get().setEnabled(false);
+        //change to 01:00
+        textViewRef.get().setVisibility(View.VISIBLE);
+        textViewRef.get().setText("01:00");
+        firstBtnRef.get().setEnabled(false);
+        secondBtnRef.get().setEnabled(false);
+        firstBtnRef.get().setBackground(ResourcesCompat.getDrawable(resourcesRef.get(), R.drawable.btn_locked, null));
+        secondBtnRef.get().setBackground(ResourcesCompat.getDrawable(resourcesRef.get(), R.drawable.btn_locked, null));
     }
 
     @Override
     protected Integer doInBackground(Void... voids) {
         Log.i(TAG, "doInBackground: ");
         try {
-            for (int i = 178; i > 0; i--) {
+            //change to 59 seconds
+            for (int i = 59; i >= 0; i--) {
                 Thread.sleep(1000L);
                 publishProgress(i);
             }
@@ -73,10 +82,10 @@ public class CounterTask extends AsyncTask<Void, Integer, Integer> {
         super.onPostExecute(integer);
         //make editText active again
         //make btn active again
-        editTextRef.get().setEnabled(true);
-        btnRef.get().setEnabled(true);
-        btnRef.get().setBackground(resourcesRef.get().getDrawable(R.drawable.btn_purple, null));
-        btnRef.get().setTextColor(Color.WHITE);
+        firstBtnRef.get().setEnabled(true);
+        firstBtnRef.get().setBackground(ResourcesCompat.getDrawable(resourcesRef.get(), R.drawable.btn_purple, null));
+        secondBtnRef.get().setEnabled(true);
+        secondBtnRef.get().setBackground(ResourcesCompat.getDrawable(resourcesRef.get(), R.drawable.btn_purple, null));
         textViewRef.get().setVisibility(View.INVISIBLE);
     }
 
@@ -100,8 +109,9 @@ public class CounterTask extends AsyncTask<Void, Integer, Integer> {
             while (!exit) {
                 try {
                     Thread.sleep(1000L);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                }
+                catch (InterruptedException e) {
+                    Log.e(TAG, "run(): ", e);
                 }
             }
         }
@@ -110,4 +120,6 @@ public class CounterTask extends AsyncTask<Void, Integer, Integer> {
             exit = true;
         }
     }
+
+    private static final String TAG = CounterTask.class.toString();
 }

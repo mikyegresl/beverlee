@@ -1,65 +1,56 @@
 package uz.alex.its.beverlee.view.fragments;
 
 import android.content.Context;
-import android.graphics.Rect;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.Selection;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.WindowManager;
-import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import uz.alex.its.beverlee.R;
-import uz.alex.its.beverlee.model.Country;
 import uz.alex.its.beverlee.model.DeviceDisplay;
-import uz.alex.its.beverlee.view.adapters.CountryAdapter;
+import uz.alex.its.beverlee.storage.SharedPrefs;
+import uz.alex.its.beverlee.utils.Constants;
+import uz.alex.its.beverlee.view.UiUtils;
+import uz.alex.its.beverlee.viewmodel.AuthViewModel;
+import uz.alex.its.beverlee.viewmodel_factory.AuthViewModelFactory;
 
 public class InputPhoneFragment extends Fragment {
-    private static final String TAG = InputPhoneFragment.class.toString();
     private FragmentActivity activity;
     private Context context;
 
+    private AuthViewModel authViewModel;
+
     private View parentLayout;
-    private AutoCompleteTextView phoneField;
+    private EditText phoneEditText;
     private EditText passwordEditText;
     private ImageView passwordEyeImageView;
     private TextView forgotPasswordTextView;
     private Button signInBtn;
-
-    private Animation bubbleAnimation;
+    private ProgressBar progressBar;
 
     private static boolean showPassword = false;
-
-    private final Map<Country, String> countryMap = new HashMap<>();
 
     public InputPhoneFragment() {
 
@@ -69,16 +60,10 @@ public class InputPhoneFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        countryMap.put(new Country("Uzbeksitan", R.drawable.ic_uzbekistan), "+998");
-        countryMap.put(new Country("Abkhazia", R.drawable.ic_abkhazia), "+995");
-        countryMap.put(new Country("Afghanistan", R.drawable.ic_afganistan), "+93");
-        countryMap.put(new Country("Barbados", R.drawable.ic_barbados), "+1246");
-        countryMap.put(new Country("Belarus", R.drawable.ic_belarus), "+375");
-        countryMap.put(new Country("Brazil", R.drawable.ic_brazil), "+55");
 
         if (getActivity() != null) {
             activity = getActivity();
-            context = activity.getApplicationContext();
+            context = requireContext();
         }
     }
 
@@ -92,18 +77,12 @@ public class InputPhoneFragment extends Fragment {
         final View root = inflater.inflate(R.layout.fragment_input_phone, container, false);
 
         parentLayout = root;
-        phoneField = root.findViewById(R.id.phone_field);
+        phoneEditText = root.findViewById(R.id.phone_edit_text);
         passwordEditText = root.findViewById(R.id.password_edit_text);
         passwordEyeImageView = root.findViewById(R.id.password_eye_image_view);
         forgotPasswordTextView = root.findViewById(R.id.forgot_password_text_view);
         signInBtn = root.findViewById(R.id.login_btn);
-
-        bubbleAnimation = AnimationUtils.loadAnimation(context, R.anim.bubble);
-
-        //populate
-        final CountryAdapter adapter = new CountryAdapter(context, R.layout.country_item, countryMap);
-        phoneField.setThreshold(2);
-        phoneField.setAdapter(adapter);
+        progressBar = root.findViewById(R.id.progress_bar);
 
         return root;
     }
@@ -116,35 +95,11 @@ public class InputPhoneFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        phoneField.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) {
-                phoneField.setBackgroundResource(R.drawable.edit_text_active);
-                phoneField.setHint("");
-                return;
-            }
-            if (phoneField.getText().length() > 0) {
-                phoneField.setBackgroundResource(R.drawable.edit_text_filled);
-                phoneField.setHint("");
-                return;
-            }
-            phoneField.setBackgroundResource(R.drawable.edit_text_locked);
-            phoneField.setHint(R.string.phone_hint);
+        phoneEditText.setOnFocusChangeListener((v, hasFocus) -> {
+            UiUtils.setFocusChange(phoneEditText, hasFocus, R.string.phone_hint);
         });
 
-        passwordEditText.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) {
-                passwordEditText.setBackgroundResource(R.drawable.edit_text_active);
-                passwordEditText.setHint("");
-                return;
-            }
-            if (passwordEditText.getText().length() > 0) {
-                passwordEditText.setBackgroundResource(R.drawable.edit_text_filled);
-                passwordEditText.setHint("");
-                return;
-            }
-            passwordEditText.setBackgroundResource(R.drawable.edit_text_locked);
-            passwordEditText.setHint(R.string.password_hint);
-        });
+        passwordEditText.setOnFocusChangeListener((v, hasFocus) -> UiUtils.setFocusChange(passwordEditText, hasFocus, R.string.password_hint));
 
         passwordEyeImageView.setOnClickListener(v -> {
             if (showPassword) {
@@ -159,47 +114,58 @@ public class InputPhoneFragment extends Fragment {
             }
         });
 
-        phoneField.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        signInBtn.setOnClickListener(v -> {
+            signInBtn.startAnimation(AnimationUtils.loadAnimation(context, R.anim.bubble));
 
+            final String phone = phoneEditText.getText().toString().trim();
+
+            if (TextUtils.isEmpty(phone)) {
+                Toast.makeText(activity, "Введите номер телефона", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (phone.length() <= 10) {
+                Toast.makeText(activity, "Неверный формат", Toast.LENGTH_SHORT).show();
+                return;
             }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            final String password = passwordEditText.getText().toString().trim();
 
+            if (TextUtils.isEmpty(password)) {
+                Toast.makeText(activity, "Введите пароль", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (password.length() <= 4) {
+                Toast.makeText(activity, "Введите минимум 5 символов", Toast.LENGTH_SHORT).show();
+                return;
             }
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s.length() >= 3 && phoneField.isSelected()) {
-                    phoneField.dismissDropDown();
+            WorkManager.getInstance(context).getWorkInfoByIdLiveData(authViewModel.login(phone, password)).observe(getViewLifecycleOwner(), workInfo -> {
+                if (workInfo.getState() == WorkInfo.State.FAILED || workInfo.getState() == WorkInfo.State.CANCELLED) {
+                    progressBar.setVisibility(View.GONE);
+                    signInBtn.setEnabled(true);
+                    signInBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.btn_purple, null));
+                    Toast.makeText(context, workInfo.getOutputData().getString(Constants.REQUEST_ERROR), Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (s.length() < 3) {
-                    phoneField.setSelected(false);
+                if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                    final String bearerToken = workInfo.getOutputData().getString(Constants.BEARER_TOKEN);
 
-                    if (!s.toString().startsWith(getResources().getString(R.string.phone_hint))) {
-                        phoneField.setText(R.string.phone_hint);
-                        Selection.setSelection(phoneField.getText(), phoneField.getText().length());
-                    }
+                    SharedPrefs.getInstance(context).putString(Constants.BEARER_TOKEN, bearerToken);
+                    SharedPrefs.getInstance(context).putString(Constants.PHONE, phone);
+
+                    progressBar.setVisibility(View.GONE);
+                    signInBtn.setEnabled(true);
+                    signInBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.btn_purple, null));
+
+                    final InputPhoneFragmentDirections.ActionInputPhoneFragmentToInputSmsFragment action = InputPhoneFragmentDirections.actionInputPhoneFragmentToInputSmsFragment();
+                    action.setPhone(phone);
+                    NavHostFragment.findNavController(InputPhoneFragment.this).navigate(action);
+                    return;
                 }
-            }
-        });
-
-        phoneField.setOnItemClickListener((adapterView, element, position, id) -> {
-            if (adapterView != null) {
-                Country country = (Country) adapterView.getItemAtPosition(position);
-                phoneField.setText(countryMap.get(country));
-                phoneField.setCompoundDrawablesWithIntrinsicBounds(country.getResourceId(), 0, 0, 0);
-                phoneField.setSelected(true);
-                phoneField.setSelection(phoneField.getText().length());
-            }
-        });
-
-        signInBtn.setOnClickListener(v -> {
-            signInBtn.startAnimation(bubbleAnimation);
-            signInBtn.postOnAnimationDelayed(() -> NavHostFragment.findNavController(InputPhoneFragment.this).navigate(R.id.action_inputPhoneFragment_to_inputSmsFragment), 100);
+                progressBar.setVisibility(View.VISIBLE);
+                signInBtn.setEnabled(false);
+                signInBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.btn_locked, null));
+            });
         });
 
         parentLayout.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
@@ -215,4 +181,15 @@ public class InputPhoneFragment extends Fragment {
             signInBtn.setLayoutParams(layoutParams);
         });
     }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        final AuthViewModelFactory factory = new AuthViewModelFactory(context);
+
+        authViewModel = new ViewModelProvider(getViewModelStore(), factory).get(AuthViewModel.class);
+    }
+
+    private static final String TAG = InputPhoneFragment.class.toString();
 }

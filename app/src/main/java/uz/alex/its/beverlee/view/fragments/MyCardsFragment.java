@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import uz.alex.its.beverlee.R;
-import uz.alex.its.beverlee.model.Card;
+import uz.alex.its.beverlee.model.transaction.Card;
 import uz.alex.its.beverlee.view.activities.OperationsContainerActivity;
 import uz.alex.its.beverlee.view.adapters.CardListVerticalAdapter;
 import uz.alex.its.beverlee.view.interfaces.CardCallback;
@@ -64,10 +64,10 @@ public class MyCardsFragment extends Fragment implements CardCallback {
             context = getActivity().getApplicationContext();
         }
 
-        cardList.add(new Card(true, "1234 5678 9012 3456", "01/22", "Антон Камушкин"));
-        cardList.add(new Card(false, "8954 2345 4659 5048", "03/21", "Роджер Федерер"));
-        cardList.add(new Card(false, "1293 1214 9898 1238", "12/20", "Сидни Кросби"));
-        cardList.add(new Card(true, "9886 0136 9081 9012", "11/21", "Джон Джонс"));
+        cardList.add(new Card(1, "1234 5678 9012 3456", "01/22", "Антон Камушкин"));
+        cardList.add(new Card(2, "8954 2345 4659 5048", "03/21", "Роджер Федерер"));
+        cardList.add(new Card(2, "1293 1214 9898 1238", "12/20", "Сидни Кросби"));
+        cardList.add(new Card(1, "9886 0136 9081 9012", "11/21", "Джон Джонс"));
     }
 
     @Override

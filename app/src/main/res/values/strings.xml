@@ -1,4 +1,6 @@
 <resources>
+    <!-- server constants -->
+    <string name="server_url">https://beverleebank.net/</string>
     <!-- fragment labels -->
     <string name="init_fragment">Init Fragment</string>
     <string name="input_phone_fragment">Input Phone Fragment</string>
@@ -19,7 +21,13 @@
     <string name="forgot_password">Забыли пароль?</string>
     <!-- sign up -->
     <string name="new_account">Новый аккаунт</string>
-    <string name="username_text">Как к Вам обращаться</string>
+    <string name="registration">Регистрация</string>
+    <string name="first_name">Имя</string>
+    <string name="last_name">Фамилия</string>
+    <string name="full_name">Полное имя</string>
+    <string name="phone_number_unified">Номер телефона в международном формате</string>
+    <string name="phone_number">Номер телефона</string>
+    <string name="email">Эл. почта</string>
     <string name="password_text">Придумайте пароль</string>
     <string name="repeat_password_text">Повторите</string>
     <string name="user_agreement">Я согласен с <u>Пользовательским соглашением</u>"\n"BeverLee</string>
@@ -29,7 +37,6 @@
     <string name="repeat_pin">Повторите PIN-код</string>
     <string name="forgot_pin">Забыли PIN-код?</string>
     <string name="or_enter_pin">Или введите PIN-код</string>
-    <string name="error_pin">Пароли не совпадают</string>
     <string name="one">1</string>
     <string name="two">2</string>
     <string name="three">3</string>
@@ -48,22 +55,21 @@
     <string name="hidden_digits">**** ** *** </string>
     <string name="last_two_digits">54 55</string>
     <string name="send_again">Отправить снова</string>
+    <string name="code_through_call">Код через звонок</string>
     <string name="counter_text">00:00</string>
     <!-- fingerprint -->
     <string name="face_id_text">Пожалуйста, наведите"\n"фронтальную камеру на лицо</string>
     <string name="fingerprint_text">Пожалуйста, приложите палец"\n"к сканеру для авторизации</string>
     <string name="success_face_id">Принято!</string>
     <string name="success_fingerprint">Отпечаток принят!</string>
-    <string name="error_face_id">Не принято!</string>
-    <string name="error_fingerprint">Отпечаток не принят!"\n"Попробуйте снова.</string>
     <!-- home page -->
     <string name="home">Кабинет</string>
     <string name="monitoring">Мониторинг</string>
     <string name="cards">Карты</string>
     <string name="contact_name">Георгий Павлович</string>
     <string name="balance">Баланс счета</string>
-    <string name="summary">$ 23 650,92</string>
-    <string name="debit">Пополнить</string>
+    <string name="current_balance">$ %s</string>
+    <string name="replenish">Пополнить</string>
     <string name="withdraw">Вывести</string>
     <string name="profit">Доходы за май</string>
     <string name="profit_summary">+ 1 200,00 $</string>
@@ -108,7 +114,7 @@
     <string name="edit">Редактировать</string>
     <!-- cards: transfer/debit/withdrawal -->
     <string name="accessible">Доступно</string>
-    <string name="debited">Пополнение</string>
+    <string name="replenishment">Пополнение</string>
     <string name="withdrawal">Вывод</string>
     <string name="choose_a_card">Выберите карту</string>
     <string name="card_name">Название карты</string>
@@ -121,14 +127,17 @@
     <string name="month_year">Срок действия</string>
     <string name="security_code">Защитный код</string>
     <string name="security_code_hint">779</string>
-    <string name="sum">Сумма</string>
+    <string name="amount">Сумма</string>
     <string name="create_card">Добавить карту</string>
     <!-- EditText hints -->
-    <string name="phone_hint">"+"</string>
-    <string name="phone_hint_uz">"+998"</string>
+    <string name="phone_hint">+998 00 000 00 00</string>
+    <string name="phone_hint_uz">+998 00 000 00 00</string>
     <string name="password_hint">****</string>
-    <string name="username_hint">Имя, Фамилия</string>
-    <string name="input_code">Введите код</string>
+    <string name="first_name_hint">Введите имя</string>
+    <string name="last_name_hint">Введите фамилию</string>
+    <string name="email_hint">Введите почту</string>
+    <string name="verification_code">Код подтверждения</string>
+    <string name="enter_code">Введите код</string>
     <string name="search">Поиск</string>
     <string name="zero">0</string>
     <string name="fullname_or_id">Имя, Фамилия или ID</string>
@@ -140,11 +149,8 @@
     <string name="pick_image">Выберите фото</string>
     <!-- personal data -->
     <string name="personal_data">Персональные данные</string>
-    <string name="first_name">Полное имя</string>
-    <string name="last_name">Фамилия</string>
     <string name="position">Должность</string>
     <string name="contact_number">Контактный номер</string>
-    <string name="email">Электронная почта</string>
     <string name="country">Страна</string>
     <string name="first_name_example">Людмила</string>
     <string name="last_name_example">Плюшкина</string>
@@ -155,6 +161,7 @@
     <string name="save">Сохранить</string>
     <!-- notifications settings -->
     <string name="notifications">Уведомления</string>
+    <string name="notify_default">Включить пуш-уведомления</string>
     <string name="notify_news">Уведомлять о новостях</string>
     <string name="notify_bonuses">Уведомлять о получении"\n"бонусов</string>
     <string name="notify_income">Уведомлять о получении"\n"средств</string>
@@ -179,4 +186,33 @@
     <string name="add">Добавить</string>
     <string name="to_main">На главную</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="beverlee_web_url">https://beverleebank.com/login</string>
+    <string name="open_registration_instruction">Открыть инструкцию по регистрации</string>
+    <string name="registration_instruction">
+        Код подтверждения выслан на указанный
+        номер телефона, если код подтверждения
+        не пришел на указанный номер, то через 2
+        минуты попробуйте снова получить код.</string>
+    <string name="city">Город</string>
+    <string name="recipient_data">Данные получателя %s</string>
+    <string name="amount_with_commission">Сумма с комиссией: %d</string>
+    <string name="middle_name">Отчество</string>
+    <string name="middle_name_example">Рустамовна</string>
+    <string name="city_example">Tashkent</string>
+    <string name="address">Адрес</string>
+    <string name="address_example">Юнусабад-8,22,28</string>
+    <string name="news">Новости</string>
+    <string name="news_title_example">Семь причин купить японские бады</string>
+    <string name="news_date_example">05.06.2021</string>
+    <string name="news_content_example">Лекарства будущего. В современной  Японии осталось совсем немного аптек.  Их практически заменили  специализированные сети по продаже  БАДов и так называемых  категориальных лекарств. В Японии  заботятся о здоровье нации и именно  поэтому повсеместно заменили  лекарства супер-эффективными  биодобавками. Не упустите ваш шанс прикоснуться к здоровью будущего  сегодня!  Японское долголетие. Японцы издавна  славятся своим долголетием.  Восемьдесят лет для современного</string>
+    <string name="news_content_expanded_example">Лекарства будущего. В современной Японии осталось совсем немного аптек. Их практически заменили специализированные сети по продаже БАДов и так называемых категориальных лекарств. В Японии заботятся о здоровье нации и именно поэтому повсеместно заменили лекарства супер-эффективными биодобавками. Не упустите ваш шанс прикоснуться к здоровью будущего сегодня! Японское долголетие. Японцы издавна славятся своим долголетием. Восемьдесят лет для современного японца — вполне обычный возраст. Во основном такая продолжительность жизни достигается именно благодаря биодобавкам. Объем японского рынка БАДов в 2010 году превысил 7 млрд. долларов и фактически все эти биодобавки произведены в Японии. Японцы не доверяют ни американским, ни европейским аналогам. Они покупают лишь проверенные и по-настоящему действенные препараты.</string>
+    <string name="news_more"><u>Подробнее</u></string>
+    <!--errors-->
+    <string name="error_wrong_pin">Пароли не совпадают</string>
+    <string name="error_face_id">Не принято!</string>
+    <string name="error_fingerprint">Отпечаток не принят!"\n"Попробуйте снова.</string>
+    <string name="error_get_balance">Не удалось загрузить данные</string>
+    <string name="error_check_internet">Ошибка! Проверьте Интернет соединение</string>
+    <string name="error_unknown">Произошла внутренняя ошибка</string>
+    <string name="pin_assign_error">Ошибка при создании пароля</string>
 </resources>

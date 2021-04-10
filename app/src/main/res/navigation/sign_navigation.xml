@@ -33,7 +33,9 @@
             android:id="@+id/action_inputPhoneFragment_to_inputSmsFragment"
             app:destination="@id/inputSmsFragment"
             app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@animator/slide_out_right" />
+            app:exitAnim="@animator/slide_out_right"
+            app:popUpTo="@id/init_fragment"
+            app:popUpToInclusive="true"/>
     </fragment>
 
     <fragment
@@ -41,19 +43,35 @@
         android:name="uz.alex.its.beverlee.view.fragments.InputSmsFragment"
         android:label="fragment_input_sms"
         tools:layout="@layout/fragment_input_sms" >
-        <action
-            android:id="@+id/action_inputSmsFragment_to_fingerprintFragment"
-            app:destination="@id/fingerprintFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/pinFragment"
-        android:name="uz.alex.its.beverlee.view.fragments.PinFragment"
-        android:label="fragment_pin"
-        tools:layout="@layout/fragment_pin" >
-        <action
-            android:id="@+id/action_pinFragment_to_splashActivity"
-            app:destination="@id/splashActivity" />
+        <argument
+            android:name="first_name"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="null"/>
+        <argument
+            android:name="last_name"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="null"/>
+        <argument
+            android:name="phone"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="null"/>
+        <argument
+            android:name="email"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="null"/>
+        <argument
+            android:name="country_id"
+            app:argType="long"
+            android:defaultValue="0L"/>
+        <argument
+            android:name="city"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="null"/>
     </fragment>
 
     <fragment
@@ -65,22 +83,4 @@
             android:id="@+id/action_signUpFragment_to_inputSmsFragment"
             app:destination="@id/inputSmsFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/fingerprintFragment"
-        android:name="uz.alex.its.beverlee.view.fragments.FingerprintFragment"
-        android:label="fragment_fingerprint"
-        tools:layout="@layout/fragment_fingerprint" >
-        <action
-            android:id="@+id/action_fingerprintFragment_to_pinFragment"
-            app:destination="@id/pinFragment" />
-        <action
-            android:id="@+id/action_fingerprintFragment_to_splashActivity"
-            app:destination="@id/splashActivity" />
-    </fragment>
-    <activity
-        android:id="@+id/splashActivity"
-        android:name="uz.alex.its.beverlee.view.activities.SplashActivity"
-        android:label="activity_splash"
-        tools:layout="@layout/activity_splash" />
-
 </navigation>

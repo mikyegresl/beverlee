@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 import uz.alex.its.beverlee.R;
-import uz.alex.its.beverlee.model.Card;
+import uz.alex.its.beverlee.model.transaction.Card;
 import uz.alex.its.beverlee.view.interfaces.CardCallback;
 
 public class CardListVerticalAdapter extends RecyclerView.Adapter<CardListVerticalAdapter.CardVerticalViewHolder> {
@@ -39,16 +39,17 @@ public class CardListVerticalAdapter extends RecyclerView.Adapter<CardListVertic
 
     @Override
     public void onBindViewHolder(@NonNull CardVerticalViewHolder holder, int position) {
-        if (cardList.get(position).isMaster()) {
+        holder.cardNoTextView.setText(cardList.get(position).getNumber());
+        holder.expDateTextView.setText(cardList.get(position).getExpDate());
+        holder.cardUsernameTextView.setText(cardList.get(position).getUsername());
+        holder.checkImageView.setVisibility(View.INVISIBLE);
+
+        if (cardList.get(position).getType() == 1) {
             holder.cardLogoImageView.setImageResource(R.drawable.ic_master_card_logo);
         }
-        else {
+        else if (cardList.get(position).getType() == 2) {
             holder.cardLogoImageView.setImageResource(R.drawable.ic_visa_card_logo);
         }
-        holder.cardNoTextView.setText(cardList.get(position).getCardNo());
-        holder.expDateTextView.setText(cardList.get(position).getCardExpDate());
-        holder.cardUsernameTextView.setText(cardList.get(position).getCardUsername());
-        holder.checkImageView.setVisibility(View.INVISIBLE);
 
         holder.bind(cardList.get(position), cardCallback);
     }

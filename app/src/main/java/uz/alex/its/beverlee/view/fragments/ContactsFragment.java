@@ -1,12 +1,15 @@
 package uz.alex.its.beverlee.view.fragments;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,15 +30,16 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import uz.alex.its.beverlee.R;
-import uz.alex.its.beverlee.model.Contact;
+import uz.alex.its.beverlee.model.actor.Contact;
+import uz.alex.its.beverlee.utils.Constants;
+import uz.alex.its.beverlee.utils.PermissionManager;
 import uz.alex.its.beverlee.view.activities.OperationsContainerActivity;
 import uz.alex.its.beverlee.view.adapters.ContactListHorizontalAdapter;
 import uz.alex.its.beverlee.view.adapters.ContactListVerticalAdapter;
 import uz.alex.its.beverlee.view.interfaces.ContactCallback;
+import uz.alex.its.beverlee.viewmodel.ContactsViewModel;
+import uz.alex.its.beverlee.viewmodel_factory.ContactsViewModelFactory;
 
 public class ContactsFragment extends Fragment implements ContactCallback {
     private Context context;
@@ -45,15 +49,9 @@ public class ContactsFragment extends Fragment implements ContactCallback {
     private RadioButton allRadioBtn;
     private RadioButton favoritesRadioBtn;
     private EditText searchFieldEditText;
-
-    private RecyclerView contactListRecyclerView;
-    private ContactListVerticalAdapter adapter;
-    private List<Contact> contactList;
-    private List<Contact> favContactList;
-
     private FloatingActionButton fab;
 
-    /*bottomSheet for contactList*/
+    /* bottomSheet for contactList */
     private BottomNavigationView bottomNavigationView;
     private LinearLayout bottomSheetContacts;
     private TextView bottomSheetContactsTransfer;
@@ -61,15 +59,22 @@ public class ContactsFragment extends Fragment implements ContactCallback {
     private TextView bottomSheetDelete;
     private BottomSheetBehavior contactsSheetBehavior;
 
-    /*bottomSheet for favContactList*/
+    /* bottomSheet for favContactList */
     private LinearLayout bottomSheetFavContacts;
     private TextView bottomSheetFavContactsTransfer;
     private TextView bottomSheetRemoveFromFav;
     private BottomSheetBehavior favsSheetBehavior;
 
-    /*select/deselect contactItem*/
+    /* select/deselect contactItem */
     private ContactListVerticalAdapter.ContactVerticalViewHolder selectedHolder = null;
     private boolean contactSelected = false;
+
+    /* contact list */
+    private RecyclerView contactListRecyclerView;
+    private ContactListVerticalAdapter adapter;
+
+    /* contacts permission */
+    private static final String[] permissionArray = { Manifest.permission.READ_CONTACTS };
 
     public ContactsFragment() {
 
@@ -79,24 +84,6 @@ public class ContactsFragment extends Fragment implements ContactCallback {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.context = getContext();
-        Log.i(TAG, "onCreate(): ");
-
-        contactList = new ArrayList<>();
-        contactList.add(new Contact("Аброр Турсунов"));
-        contactList.add(new Contact("Нигора Икромова"));
-        contactList.add(new Contact("Сидни Кросби"));
-        contactList.add(new Contact("Роджер Федерер"));
-        contactList.add(new Contact("Винстон Черчиль"));
-        contactList.add(new Contact("Мао Цзедун"));
-        contactList.add(new Contact("Авраам Линкольн"));
-        contactList.add(new Contact("Галь Гадот"));
-        contactList.add(new Contact("Моника Беллучи"));
-        contactList.add(new Contact("Сергей Ким"));
-
-        favContactList = new ArrayList<>();
-        favContactList.add(new Contact("Галь Гадот"));
-        favContactList.add(new Contact("Моника Беллучи"));
-        favContactList.add(new Contact("Нигора Икромова"));
     }
 
     @Override
@@ -116,7 +103,6 @@ public class ContactsFragment extends Fragment implements ContactCallback {
 
         contactListRecyclerView.setLayoutManager(layoutManager);
         contactListRecyclerView.setAdapter(adapter);
-        adapter.setContactList(contactList);
 
         if (getActivity() != null) {
             fab = getActivity().findViewById(R.id.floating_btn);
@@ -154,18 +140,18 @@ public class ContactsFragment extends Fragment implements ContactCallback {
 
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == allRadioBtn.getId()) {
-                radioGroup.setBackground(getResources().getDrawable(R.drawable.radio_group_income, null));
+                radioGroup.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.radio_group_income, null));
                 allRadioBtn.setTextColor(getResources().getColor(R.color.colorWhite, null));
                 favoritesRadioBtn.setTextColor(getResources().getColor(R.color.colorDarkGrey, null));
-                adapter.setContactList(contactList);
+//                adapter.setContactList(contactList);
                 revertItems();
                 return;
             }
             if (checkedId == favoritesRadioBtn.getId()) {
-                radioGroup.setBackground(getResources().getDrawable(R.drawable.radio_group_exp, null));
+                radioGroup.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.radio_group_exp, null));
                 allRadioBtn.setTextColor(getResources().getColor(R.color.colorDarkGrey, null));
                 favoritesRadioBtn.setTextColor(getResources().getColor(R.color.colorWhite, null));
-                adapter.setContactList(favContactList);
+//                adapter.setContactList(favContactList);
                 revertItems();
             }
         });
@@ -186,6 +172,7 @@ public class ContactsFragment extends Fragment implements ContactCallback {
                     case BottomSheetBehavior.STATE_EXPANDED: {
                         bottomNavigationView.setVisibility(View.INVISIBLE);
                         fab.setVisibility(View.INVISIBLE);
+                        Log.i(TAG, "onStateChanged() expanded: ");
                         break;
                     }
                     case BottomSheetBehavior.STATE_SETTLING: {
@@ -193,8 +180,17 @@ public class ContactsFragment extends Fragment implements ContactCallback {
                             bottomNavigationView.setVisibility(View.VISIBLE);
                             fab.setVisibility(View.VISIBLE);
                         }
+                        Log.i(TAG, "onStateChanged(): hidden");
                         break;
                     }
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        break;
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        break;
+                    case BottomSheetBehavior.STATE_HALF_EXPANDED:
+                        break;
+                    case BottomSheetBehavior.STATE_HIDDEN:
+                        break;
                 }
             }
 
@@ -229,6 +225,23 @@ public class ContactsFragment extends Fragment implements ContactCallback {
 
         bottomSheetRemoveFromFav.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Удалено из избранных", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        final ContactsViewModelFactory factory = new ContactsViewModelFactory(context);
+        final ContactsViewModel contactsViewModel = new ViewModelProvider(getViewModelStore(), factory).get(ContactsViewModel.class);
+
+        if (PermissionManager.getInstance().permissionsGranted(requireContext(), permissionArray, Constants.REQUEST_CODE_READ_CONTACTS)) {
+            contactsViewModel.loadContactList();
+        }
+
+        contactsViewModel.getContactList().observe(getViewLifecycleOwner(), contactList -> {
+            Log.i(TAG, "contactList: " + contactList);
+            adapter.setContactList(contactList);
         });
     }
 

@@ -2,14 +2,18 @@ package uz.alex.its.beverlee.view.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
 
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,14 +29,18 @@ import android.widget.Toast;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.squareup.picasso.Picasso;
 
-import uz.alex.its.beverlee.Constants;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import uz.alex.its.beverlee.utils.Constants;
 import uz.alex.its.beverlee.R;
 
 import static android.app.Activity.RESULT_OK;
 
 public class ProfileFragment extends Fragment {
-    private static final String TAG = ProfileFragment.class.toString();
-
     private ImageView backArrowImageView;
     private ImageView avatarImageView;
     private ImageView changeProfilePhotoImageView;
@@ -41,10 +49,6 @@ public class ProfileFragment extends Fragment {
 
     private boolean bottomSheetHidden = true;
     private boolean imageSelected = false;
-    private static int lastPosition = -1;
-    private static int selectedAvatarId = -1;
-    private static int selectedNameId = -1;
-    private static int selectedCheckId = -1;
 
     private LinearLayout bottomSheet;
     private TextView bottomSheetPersonalData;
@@ -235,16 +239,104 @@ public class ProfileFragment extends Fragment {
                     Toast.makeText(getContext(), "Ошибка: пустой ответ", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                InputStream in = null;
+                ExifInterface exifInterface = null;
+                Matrix matrix = null;
+                Bitmap src = null;
+
                 final Uri selectedImageURI = data.getData();
-                Log.i(TAG, "onActivityResult(): data=" + selectedImageURI);
+
+                try {
+                    src = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), selectedImageURI);
+                }
+                catch (IOException e) {
+                    Log.e(TAG, "onActivityResult(): ", e);
+                }
+
+                try {
+                    in = requireContext().getContentResolver().openInputStream(selectedImageURI);
+                     exifInterface = new ExifInterface(in);
+                }
+                catch (IOException e) {
+                    Log.e(TAG, "onActivityResult(): ", e);
+                }
+                finally {
+                    if (in != null) {
+                        try {
+                            in.close();
+                        }
+                        catch (IOException e) {
+                            Log.e(TAG, "onActivityResult(): ", e);
+                        }
+                    }
+                }
+                if (exifInterface == null) {
+                    Log.e(TAG, "onActivityResult(): exifInterface is NULL");
+                    return;
+                }
+
+                int rotation = 0;
+                int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+
+                switch (orientation) {
+                    case ExifInterface.ORIENTATION_ROTATE_90: {
+                        rotation = 90;
+                        break;
+                    }
+                    case ExifInterface.ORIENTATION_ROTATE_180: {
+                        rotation = 180;
+                        break;
+                    }
+                    case ExifInterface.ORIENTATION_ROTATE_270: {
+                        rotation = 270;
+                        break;
+                    }
+                }
+                matrix = new Matrix();
+
+                if (rotation > 0) {
+                    matrix.postRotate(rotation);
+                }
+                final Bitmap adjustedBitmap = Bitmap.createBitmap(
+                        src,
+                        0,
+                        0,
+                        src.getWidth(),
+                        src.getHeight(),
+                        matrix,
+                        true);
+
+                OutputStream outputStream = null;
+                Uri finalImgUri = null;
+
+                try {
+                    finalImgUri = Uri.fromFile(File.createTempFile("temp_file_name", ".jpg", requireContext().getCacheDir()));
+                    outputStream = requireContext().getContentResolver().openOutputStream(finalImgUri);
+                    adjustedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                }
+                catch (Exception e) {
+                    Log.e(TAG,"onActivityResult():", e);
+                }
+                finally {
+                    try {
+                        if (outputStream != null) {
+                            outputStream.close();
+                        }
+                    }
+                    catch (IOException e) {
+                        Log.e(TAG, "onActivityResult(): ", e);
+                    }
+                }
+
                 Picasso.get()
-                        .load(selectedImageURI)
+                        .load(finalImgUri)
                         .noPlaceholder()
                         .fit()
-                        .centerInside()
-                        .rotate(90)
+                        .centerCrop()
                         .into(avatarImageView);
             }
         }
     }
+
+    private static final String TAG = ProfileFragment.class.toString();
 }

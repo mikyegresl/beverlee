@@ -28,7 +28,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:contentDescription="@string/text_content_desc"
-        android:layout_marginTop="24dp" />
+        android:layout_marginTop="24dp"
+        app:tint="@color/colorWhite"
+        android:backgroundTint="@color/colorWhite"
+        android:foregroundTint="@color/colorWhite"/>
 
     <Button
         android:id="@+id/sign_in_button"

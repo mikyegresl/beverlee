@@ -1,24 +1,24 @@
 package uz.alex.its.beverlee.view.activities;
 
+import android.Manifest;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
 
 import uz.alex.its.beverlee.R;
-import uz.alex.its.beverlee.viewmodel.ContactsViewModel;
+import uz.alex.its.beverlee.utils.Constants;
+import uz.alex.its.beverlee.utils.PermissionManager;
 
 public class ContactsActivity extends BaseActivity {
-    private static final String TAG = ContactsActivity.class.toString();
+    private static final String[] permissionArray = { Manifest.permission.READ_CONTACTS };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final ContactsViewModel viewModel = new ViewModelProvider(this).get(ContactsViewModel.class);
-        viewModel.getContactList().observe(this, contactList -> {
-            //updateUI
-        });
+        if (!PermissionManager.getInstance().permissionsGranted(this, permissionArray, Constants.REQUEST_CODE_READ_CONTACTS)) {
+            PermissionManager.getInstance().requestPermissions(this, permissionArray, Constants.REQUEST_CODE_READ_CONTACTS);
+        }
     }
 
     @Override
@@ -30,4 +30,6 @@ public class ContactsActivity extends BaseActivity {
     int getBottomNavigationMenuItemId() {
         return R.id.navigation_contacts;
     }
+
+    private static final String TAG = ContactsActivity.class.toString();
 }
