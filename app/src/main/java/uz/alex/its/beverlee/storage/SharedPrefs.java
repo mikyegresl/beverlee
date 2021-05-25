@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import uz.alex.its.beverlee.model.actor.UserModel.User;
 import uz.alex.its.beverlee.utils.Constants;
 
 public class SharedPrefs {
@@ -100,6 +101,26 @@ public class SharedPrefs {
         catch (ExecutionException | InterruptedException e) {
             Log.e(TAG, "getBoolean(): ", e);
             return 0L;
+        }
+    }
+
+    public void saveUserData(final User userData) {
+        putLong(Constants.USER_ID, userData.getId());
+        putLong(Constants.CLUB_NUMBER, userData.getClubNumber());
+        putString(Constants.FIRST_NAME, userData.getFirstName());
+        putString(Constants.LAST_NAME, userData.getLastName());
+        putString(Constants.MIDDLE_NAME, userData.getMiddleName());
+        putString(Constants.PHONE, userData.getPhone());
+        putString(Constants.EMAIL, userData.getEmail());
+        putString(Constants.POSITION, userData.getPosition());
+        putString(Constants.ADDRESS, userData.getAddress());
+        putString(Constants.CITY, userData.getCity());
+        putString(Constants.PHOTO_URL, userData.getPhotoUrl());
+
+        if (userData.getCountry() != null) {
+            putLong(Constants.COUNTRY_ID, userData.getCountry().getId());
+            putString(Constants.COUNTRY_CODE, userData.getCountry().getCode());
+            putString(Constants.COUNTRY_TITLE, userData.getCountry().getTitle());
         }
     }
 

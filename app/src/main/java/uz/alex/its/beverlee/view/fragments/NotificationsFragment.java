@@ -5,6 +5,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +19,7 @@ import android.widget.ImageView;
 import uz.alex.its.beverlee.R;
 
 public class NotificationsFragment extends Fragment {
+    private SwipeRefreshLayout swipeRefreshLayout;
     private ImageView backArrowImageView;
 
     public NotificationsFragment() {
@@ -26,9 +29,6 @@ public class NotificationsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-
-        }
     }
 
     @Override
@@ -46,9 +46,7 @@ public class NotificationsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         backArrowImageView.setOnClickListener(v -> {
-            if (getActivity() != null) {
-                getActivity().onBackPressed();
-            }
+            NavHostFragment.findNavController(this).popBackStack();
         });
     }
 }

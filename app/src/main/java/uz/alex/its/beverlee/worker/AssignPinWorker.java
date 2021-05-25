@@ -29,26 +29,25 @@ public class AssignPinWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-//        final Data.Builder outputDataBuilder = new Data.Builder();
-//
-//        try {
-//            final Response<Void> response = RetrofitClient.getInstance(context).assignPin(pinParams);
-//
-//            if (response.code() == 201 && response.isSuccessful()) {
-//                return Result.success();
-//            }
-//            final ResponseBody error = response.errorBody();
-//
-//            if (error == null) {
-//                return Result.failure(outputDataBuilder.putString(Constants.REQUEST_ERROR, Constants.UNKNOWN_ERROR).build());
-//            }
-//            return Result.failure(outputDataBuilder.putString(Constants.REQUEST_ERROR, error.string()).build());
-//        }
-//        catch (IOException e) {
-//            Log.e(TAG, "doWork(): ", e);
-//            return Result.failure(outputDataBuilder.putString(Constants.REQUEST_ERROR, e.getMessage()).build());
-//        }
-        return Result.success();
+        final Data.Builder outputDataBuilder = new Data.Builder();
+
+        try {
+            final Response<Void> response = RetrofitClient.getInstance(context).assignPin(pinParams);
+
+            if (response.code() == 201 && response.isSuccessful()) {
+                return Result.success();
+            }
+            final ResponseBody error = response.errorBody();
+
+            if (error == null) {
+                return Result.failure(outputDataBuilder.putString(Constants.REQUEST_ERROR, Constants.UNKNOWN_ERROR).build());
+            }
+            return Result.failure(outputDataBuilder.putString(Constants.REQUEST_ERROR, error.string()).build());
+        }
+        catch (IOException e) {
+            Log.e(TAG, "doWork(): ", e);
+            return Result.failure(outputDataBuilder.putString(Constants.REQUEST_ERROR, e.getMessage()).build());
+        }
     }
 
     private static final String TAG = AssignPinWorker.class.toString();

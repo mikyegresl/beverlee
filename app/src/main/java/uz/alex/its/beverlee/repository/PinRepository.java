@@ -13,7 +13,7 @@ import java.util.UUID;
 import uz.alex.its.beverlee.utils.Constants;
 import uz.alex.its.beverlee.worker.AssignPinWorker;
 import uz.alex.its.beverlee.worker.CheckPinAssignedWorker;
-import uz.alex.its.beverlee.worker.CheckVerifiedWorker;
+import uz.alex.its.beverlee.worker.VerifyPinWorker;
 
 public class PinRepository {
     private final Context context;
@@ -21,7 +21,6 @@ public class PinRepository {
     public PinRepository(final Context context) {
         this.context = context;
     }
-
 
     public UUID assignPin(final String pin) {
         final Constraints constraints = new Constraints.Builder()
@@ -50,11 +49,26 @@ public class PinRepository {
                 .setRequiresCharging(false)
                 .setRequiresBatteryNotLow(false)
                 .build();
-        final OneTimeWorkRequest registerRequest = new OneTimeWorkRequest.Builder(CheckPinAssignedWorker.class)
+        final OneTimeWorkRequest checkPinAssignedRequest = new OneTimeWorkRequest.Builder(CheckPinAssignedWorker.class)
                 .setConstraints(constraints)
                 .build();
-        WorkManager.getInstance(context).enqueue(registerRequest);
-        return registerRequest.getId();
+        WorkManager.getInstance(context).enqueue(checkPinAssignedRequest);
+        return checkPinAssignedRequest.getId();
     }
 
+    public UUID verifyPin(final String pincode) {
+        final Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresDeviceIdle(false)
+                .setRequiresStorageNotLow(false)
+                .setRequiresCharging(false)
+                .setRequiresBatteryNotLow(false)
+                .build();
+        final OneTimeWorkRequest verifyPinRequest = new OneTimeWorkRequest.Builder(VerifyPinWorker.class)
+                .setConstraints(constraints)
+                .setInputData(new Data.Builder().putString(Constants.PINCODE, pincode).build())
+                .build();
+        WorkManager.getInstance(context).enqueue(verifyPinRequest);
+        return verifyPinRequest.getId();
+    }
 }

@@ -19,7 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import uz.alex.its.beverlee.R;
-import uz.alex.its.beverlee.model.News;
+import uz.alex.its.beverlee.model.news.NewsModel.News;
 import uz.alex.its.beverlee.view.UiUtils;
 import uz.alex.its.beverlee.view.adapters.NewsAdapter;
 import uz.alex.its.beverlee.view.interfaces.NewsCallback;
@@ -58,11 +58,11 @@ public class NewsFragment extends Fragment implements NewsCallback {
         layoutManager = new LinearLayoutManager(requireContext());
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
 
-        newsAdapter = new NewsAdapter(requireContext(), this);
+        newsAdapter = new NewsAdapter(requireContext(), this, NewsAdapter.TYPE_BANNER);
         newsRecyclerView.setLayoutManager(layoutManager);
         newsRecyclerView.setAdapter(newsAdapter);
 
-        UiUtils.hideBottomItems(requireActivity());
+        UiUtils.hideBottomNav(requireActivity());
 
         return root;
     }
@@ -107,12 +107,12 @@ public class NewsFragment extends Fragment implements NewsCallback {
             newsAdapter.notifyDataSetChanged();
         });
 
-        newsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-            }
-        });
+//        newsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//            }
+//        });
     }
 
 

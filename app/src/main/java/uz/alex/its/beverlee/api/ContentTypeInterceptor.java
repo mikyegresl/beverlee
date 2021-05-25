@@ -23,7 +23,7 @@ public class ContentTypeInterceptor implements Interceptor {
     }
 
     private static final String CONTENT_TYPE_HEADER = "Content-Type";
-    private static final String CONTENT_TYPE_VALUE = "application/json; charset=UTF-8;";
+    private static final String CONTENT_TYPE_VALUE = "application/json; charset=utf-8;";
 
     private static final String TAG = ContentTypeInterceptor.class.toString();
 }

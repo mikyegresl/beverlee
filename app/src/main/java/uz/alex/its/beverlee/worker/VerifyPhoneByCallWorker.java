@@ -28,6 +28,8 @@ public class VerifyPhoneByCallWorker extends Worker {
     public Result doWork() {
         final Data.Builder outputDataBuilder = new Data.Builder();
 
+        RetrofitClient.getInstance(getApplicationContext()).setAuthorizationHeader(getApplicationContext());
+
         try {
             final Response<Void> response = RetrofitClient.getInstance(context).verifyCall();
 

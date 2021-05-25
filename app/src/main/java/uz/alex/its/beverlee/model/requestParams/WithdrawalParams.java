@@ -16,7 +16,7 @@ public class WithdrawalParams {
 
     @Expose
     @SerializedName("amount")
-    private final String amount;
+    private final double amount;
 
     @Expose
     @SerializedName("card")
@@ -32,7 +32,7 @@ public class WithdrawalParams {
 
     @Expose
     @SerializedName("country")
-    private final String country;
+    private final String countryTitle;
 
     @Expose
     @SerializedName("city")
@@ -40,11 +40,11 @@ public class WithdrawalParams {
 
     public WithdrawalParams(final String type,
                             final String method,
-                            final String amount,
+                            final double amount,
                             final String cardNumber,
                             final String fullName,
                             final String phone,
-                            final String country,
+                            final String countryTitle,
                             final String city) {
         this.type = type;
         this.method = method;
@@ -52,7 +52,7 @@ public class WithdrawalParams {
         this.cardNumber = cardNumber;
         this.fullName = fullName;
         this.phone = phone;
-        this.country = country;
+        this.countryTitle = countryTitle;
         this.city = city;
     }
 
@@ -64,7 +64,7 @@ public class WithdrawalParams {
         return method;
     }
 
-    public String getAmount() {
+    public double getAmount() {
         return amount;
     }
 
@@ -80,8 +80,8 @@ public class WithdrawalParams {
         return phone;
     }
 
-    public String getCountry() {
-        return country;
+    public String getCountryTitle() {
+        return countryTitle;
     }
 
     public String getCity() {
@@ -98,7 +98,7 @@ public class WithdrawalParams {
                 ", cardNumber='" + cardNumber + '\'' +
                 ", fullName='" + fullName + '\'' +
                 ", phone='" + phone + '\'' +
-                ", country='" + country + '\'' +
+                ", countryTitle='" + countryTitle + '\'' +
                 ", city='" + city + '\'' +
                 '}';
     }

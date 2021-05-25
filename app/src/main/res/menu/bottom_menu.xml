@@ -22,11 +22,4 @@
         android:enabled="true"
         android:title="@string/contacts"
         app:showAsAction="ifRoom"/>
-
-    <item
-        android:id="@+id/navigation_cards"
-        android:icon="@drawable/ic_cards_selector"
-        android:enabled="true"
-        android:title="@string/cards"
-        app:showAsAction="ifRoom"/>
 </menu>

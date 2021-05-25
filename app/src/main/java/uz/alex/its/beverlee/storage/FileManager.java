@@ -9,14 +9,13 @@ import java.io.IOException;
 
 public class FileManager {
     private final String appDirname;
-    private final String signatureDirname;
-    private final String documentDirname;
+    private final String photosDirname;
+
     private static FileManager instance;
 
     private FileManager(final Context context) {
         this.appDirname = context.getExternalFilesDir(null).getAbsolutePath();
-        this.signatureDirname = appDirname + File.separator + "signatures";
-        this.documentDirname = appDirname + File.separator + "documents";
+        this.photosDirname = appDirname + File.separator + "photos";
         makeFiles();
     }
 
@@ -26,15 +25,10 @@ public class FileManager {
         if (!appDir.exists()) {
             appDir.mkdirs();
         }
-        final File signatureDir = new File(signatureDirname);
+        final File photosDir = new File(photosDirname);
 
-        if (!signatureDir.exists()) {
-            signatureDir.mkdir();
-        }
-        final File documentDir = new File(documentDirname);
-
-        if (!documentDir.exists()) {
-            documentDir.mkdir();
+        if (!photosDir.exists()) {
+            photosDir.mkdir();
         }
     }
 
@@ -49,18 +43,21 @@ public class FileManager {
         return instance;
     }
 
-    public String storeBitmap(final Bitmap bitmap) {
-        final String screenshotFilename = signatureDirname + File.separator + System.currentTimeMillis() + ".png";
-        final File screenshotFile = new File(screenshotFilename);
+    public File storeBitmap(final Bitmap bitmap) {
+        if (bitmap == null) {
+            Log.e(TAG, "storeBitmap() bitmap is NULL");
+            return null;
+        }
+
+        final String photoFilename = photosDirname + File.separator + System.currentTimeMillis() + ".jpg";
+        final File photoFile = new File(photoFilename);
         FileOutputStream fos = null;
 
         try {
-            fos = new FileOutputStream(screenshotFile);
-            if (bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)) {
-                return screenshotFilename;
+            fos = new FileOutputStream(photoFile);
+            if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)) {
+                return photoFile;
             }
-            // bmp is your Bitmap instance
-            // PNG is a lossless format, the compression factor (100) is ignored
         }
         catch (IOException e) {
             Log.e(TAG, "storeBitmap(): ", e);
@@ -68,6 +65,7 @@ public class FileManager {
         finally {
             if (fos != null) {
                 try {
+                    fos.flush();
                     fos.close();
                 }
                 catch (IOException e) {

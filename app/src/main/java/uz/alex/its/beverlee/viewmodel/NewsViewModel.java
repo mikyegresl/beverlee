@@ -12,10 +12,10 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import uz.alex.its.beverlee.model.News;
-import uz.alex.its.beverlee.model.NewsData;
-import uz.alex.its.beverlee.model.response.NewsDataResponse;
-import uz.alex.its.beverlee.model.response.NewsResponse;
+import uz.alex.its.beverlee.model.news.NewsModel.News;
+import uz.alex.its.beverlee.model.news.NewsDataModel.NewsData;
+import uz.alex.its.beverlee.model.news.NewsDataModel;
+import uz.alex.its.beverlee.model.news.NewsModel;
 import uz.alex.its.beverlee.repository.NewsRepository;
 
 public class NewsViewModel extends ViewModel {
@@ -29,78 +29,70 @@ public class NewsViewModel extends ViewModel {
         this.newsDataMutableLiveData = new MutableLiveData<>();
     }
 
-    public void fetchNews(final int page, final int perPage) {
-        repository.fetchNews(page, perPage, new Callback<NewsResponse>() {
+    public void fetchNews(final Integer page, final Integer perPage) {
+        repository.fetchNews(page, perPage, new Callback<NewsModel>() {
             @Override
-            public void onResponse(@NonNull Call<NewsResponse> call, @NonNull Response<NewsResponse> response) {
+            public void onResponse(@NonNull Call<NewsModel> call, @NonNull Response<NewsModel> response) {
                 if (response.code() == 200 && response.isSuccessful()) {
-                    final NewsResponse customizableObject = response.body();
+                    final NewsModel customizableObject = response.body();
 
                     if (customizableObject == null) {
-                        Log.w(TAG, "doWork(): empty response from server");
+                        Log.w(TAG, "fetchNews(): empty response from server");
                         return;
                     }
                     final int itemCount = customizableObject.getRecordsTotal();
                     final List<News> newsList = customizableObject.getNewsList();
 
                     if (newsList == null) {
-                        Log.w(TAG, "doWork(): newsList is NULL");
+                        Log.w(TAG, "fetchNews(): newsList is NULL");
                         return;
                     }
                     if (newsList.isEmpty()) {
-                        Log.w(TAG, "doWork(): newsList is empty");
+                        Log.w(TAG, "fetchNews(): newsList is empty");
                         return;
                     }
-                    setNewsList(newsList);
+                    newsMutableLiveData.setValue(newsList);
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<NewsResponse> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<NewsModel> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure(): ", t);
             }
         });
     }
 
     public void fetchNewsData(final long newsId) {
-        repository.fetchNewsData(newsId, new Callback<NewsDataResponse>() {
+        repository.fetchNewsData(newsId, new Callback<NewsDataModel>() {
             @Override
-            public void onResponse(@NonNull Call<NewsDataResponse> call, @NonNull Response<NewsDataResponse> response) {
+            public void onResponse(@NonNull Call<NewsDataModel> call, @NonNull Response<NewsDataModel> response) {
                 if (response.code() == 200 && response.isSuccessful()) {
-                    final NewsDataResponse customizableObject = response.body();
+                    final NewsDataModel customizableObject = response.body();
 
                     if (customizableObject == null) {
-                        Log.w(TAG, "doWork(): empty response from server");
+                        Log.w(TAG, "fetchNewsData(): empty response from server");
                         return;
                     }
                     final int itemCount = customizableObject.getRecordsTotal();
                     final List<NewsData> newsData = customizableObject.getNewsData();
 
                     if (newsData == null) {
-                        Log.w(TAG, "doWork(): newsList is NULL");
+                        Log.w(TAG, "fetchNewsData(): newsList is NULL");
                         return;
                     }
                     if (newsData.isEmpty()) {
-                        Log.w(TAG, "doWork(): newsList is empty");
+                        Log.w(TAG, "fetchNewsData(): newsList is empty");
                         return;
                     }
-                    setNewsData(newsData);
+                    newsDataMutableLiveData.setValue(newsData);
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<NewsDataResponse> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<NewsDataModel> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure(): ", t);
             }
         });
-    }
-
-    public void setNewsData(final List<NewsData> newsData) {
-        this.newsDataMutableLiveData.setValue(newsData);
-    }
-
-    public void setNewsList(final List<News> newsList) {
-        this.newsMutableLiveData.setValue(newsList);
     }
 
     public LiveData<List<News>> getNewsList() {

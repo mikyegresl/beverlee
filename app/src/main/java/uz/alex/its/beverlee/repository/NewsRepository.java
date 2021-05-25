@@ -1,24 +1,11 @@
 package uz.alex.its.beverlee.repository;
 
 import android.content.Context;
-import android.util.Log;
 
-import androidx.annotation.NonNull;
-import androidx.work.ListenableWorker;
-
-import java.util.List;
-
-import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.Response;
 import uz.alex.its.beverlee.api.RetrofitClient;
-import uz.alex.its.beverlee.model.Country;
-import uz.alex.its.beverlee.model.News;
-import uz.alex.its.beverlee.model.NewsData;
-import uz.alex.its.beverlee.model.response.CountriesResponse;
-import uz.alex.its.beverlee.model.response.NewsDataResponse;
-import uz.alex.its.beverlee.model.response.NewsResponse;
-import uz.alex.its.beverlee.storage.LocalDatabase;
+import uz.alex.its.beverlee.model.news.NewsDataModel;
+import uz.alex.its.beverlee.model.news.NewsModel;
 
 public class NewsRepository {
     private final Context context;
@@ -27,11 +14,13 @@ public class NewsRepository {
         this.context = context;
     }
 
-    public void fetchNews(final int page, final int perPage, final Callback<NewsResponse> callback) {
+    public void fetchNews(final Integer page, final Integer perPage, final Callback<NewsModel> callback) {
+        RetrofitClient.getInstance(context).setAuthorizationHeader(context);
         RetrofitClient.getInstance(context).getNews(page, perPage, callback);
     }
 
-    public void fetchNewsData(final long newsId, final Callback<NewsDataResponse> callback) {
+    public void fetchNewsData(final long newsId, final Callback<NewsDataModel> callback) {
+        RetrofitClient.getInstance(context).setAuthorizationHeader(context);
         RetrofitClient.getInstance(context).getNewsData(newsId, callback);
     }
 

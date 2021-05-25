@@ -5,7 +5,9 @@ import androidx.annotation.NonNull;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class VerifyTransferParams {
+import java.io.Serializable;
+
+public class VerifyTransferParams implements Serializable {
     @Expose
     @SerializedName("recipient_id")
     private final long recipientId;
@@ -18,7 +20,7 @@ public class VerifyTransferParams {
     @SerializedName("add_notebook")
     private final String note;
 
-    public VerifyTransferParams(final long recipientId, final double amount, final String note, final String pin) {
+    public VerifyTransferParams(final long recipientId, final double amount, final String note) {
         this.recipientId = recipientId;
         this.amount = amount;
         this.note = note;

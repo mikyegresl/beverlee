@@ -1,11 +1,10 @@
 package uz.alex.its.beverlee.view.fragments;
 
-import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,36 +18,32 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.work.WorkInfo;
-import androidx.work.WorkManager;
 
 import uz.alex.its.beverlee.R;
-import uz.alex.its.beverlee.model.DeviceDisplay;
 import uz.alex.its.beverlee.storage.SharedPrefs;
 import uz.alex.its.beverlee.utils.Constants;
 import uz.alex.its.beverlee.view.UiUtils;
+import uz.alex.its.beverlee.view.activities.MainActivity;
 import uz.alex.its.beverlee.viewmodel.AuthViewModel;
+import uz.alex.its.beverlee.viewmodel.PinViewModel;
 import uz.alex.its.beverlee.viewmodel_factory.AuthViewModelFactory;
+import uz.alex.its.beverlee.viewmodel_factory.PinViewModelFactory;
 
 public class InputPhoneFragment extends Fragment {
-    private FragmentActivity activity;
-    private Context context;
-
-    private AuthViewModel authViewModel;
-
-    private View parentLayout;
     private EditText phoneEditText;
     private EditText passwordEditText;
     private ImageView passwordEyeImageView;
     private TextView forgotPasswordTextView;
     private Button signInBtn;
     private ProgressBar progressBar;
+
+    private AuthViewModel authViewModel;
+    private PinViewModel pinViewModel;
 
     private static boolean showPassword = false;
 
@@ -60,11 +55,11 @@ public class InputPhoneFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        final AuthViewModelFactory authFactory = new AuthViewModelFactory(requireContext());
+        final PinViewModelFactory pinFactory = new PinViewModelFactory(requireContext());
 
-        if (getActivity() != null) {
-            activity = getActivity();
-            context = requireContext();
-        }
+        authViewModel = new ViewModelProvider(getViewModelStore(), authFactory).get(AuthViewModel.class);
+        pinViewModel = new ViewModelProvider(getViewModelStore(), pinFactory).get(PinViewModel.class);
     }
 
     @Override
@@ -76,7 +71,6 @@ public class InputPhoneFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.fragment_input_phone, container, false);
 
-        parentLayout = root;
         phoneEditText = root.findViewById(R.id.phone_edit_text);
         passwordEditText = root.findViewById(R.id.password_edit_text);
         passwordEyeImageView = root.findViewById(R.id.password_eye_image_view);
@@ -115,70 +109,30 @@ public class InputPhoneFragment extends Fragment {
         });
 
         signInBtn.setOnClickListener(v -> {
-            signInBtn.startAnimation(AnimationUtils.loadAnimation(context, R.anim.bubble));
+            signInBtn.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.bubble));
 
             final String phone = phoneEditText.getText().toString().trim();
 
             if (TextUtils.isEmpty(phone)) {
-                Toast.makeText(activity, "Введите номер телефона", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Введите номер телефона", Toast.LENGTH_SHORT).show();
                 return;
             }
             if (phone.length() <= 10) {
-                Toast.makeText(activity, "Неверный формат", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Неверный формат", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             final String password = passwordEditText.getText().toString().trim();
 
             if (TextUtils.isEmpty(password)) {
-                Toast.makeText(activity, "Введите пароль", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Введите пароль", Toast.LENGTH_SHORT).show();
                 return;
             }
             if (password.length() <= 4) {
-                Toast.makeText(activity, "Введите минимум 5 символов", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Введите минимум 5 символов", Toast.LENGTH_SHORT).show();
                 return;
             }
-
-            WorkManager.getInstance(context).getWorkInfoByIdLiveData(authViewModel.login(phone, password)).observe(getViewLifecycleOwner(), workInfo -> {
-                if (workInfo.getState() == WorkInfo.State.FAILED || workInfo.getState() == WorkInfo.State.CANCELLED) {
-                    progressBar.setVisibility(View.GONE);
-                    signInBtn.setEnabled(true);
-                    signInBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.btn_purple, null));
-                    Toast.makeText(context, workInfo.getOutputData().getString(Constants.REQUEST_ERROR), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
-                    final String bearerToken = workInfo.getOutputData().getString(Constants.BEARER_TOKEN);
-
-                    SharedPrefs.getInstance(context).putString(Constants.BEARER_TOKEN, bearerToken);
-                    SharedPrefs.getInstance(context).putString(Constants.PHONE, phone);
-
-                    progressBar.setVisibility(View.GONE);
-                    signInBtn.setEnabled(true);
-                    signInBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.btn_purple, null));
-
-                    final InputPhoneFragmentDirections.ActionInputPhoneFragmentToInputSmsFragment action = InputPhoneFragmentDirections.actionInputPhoneFragmentToInputSmsFragment();
-                    action.setPhone(phone);
-                    NavHostFragment.findNavController(InputPhoneFragment.this).navigate(action);
-                    return;
-                }
-                progressBar.setVisibility(View.VISIBLE);
-                signInBtn.setEnabled(false);
-                signInBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.btn_locked, null));
-            });
-        });
-
-        parentLayout.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-            final ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) signInBtn.getLayoutParams();
-            if (DeviceDisplay.getInstance(activity).getKeyboardHeight(parentLayout) > 500) {
-                layoutParams.topToBottom = forgotPasswordTextView.getId();
-                layoutParams.topMargin = DeviceDisplay.getInstance(activity).dpToPx(context, 50);
-            }
-            else if (DeviceDisplay.getInstance(activity).getKeyboardHeight(parentLayout) == 0) {
-                layoutParams.topToBottom = -1;
-                layoutParams.topMargin = -1;
-            }
-            signInBtn.setLayoutParams(layoutParams);
+            authViewModel.login(phone, password);
         });
     }
 
@@ -186,9 +140,61 @@ public class InputPhoneFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        final AuthViewModelFactory factory = new AuthViewModelFactory(context);
+        authViewModel.getLoginResult(requireContext()).observe(getViewLifecycleOwner(), workInfo -> {
+            if (workInfo.getState() == WorkInfo.State.FAILED || workInfo.getState() == WorkInfo.State.CANCELLED) {
+                progressBar.setVisibility(View.GONE);
+                signInBtn.setEnabled(true);
+                signInBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.btn_purple, null));
+                Toast.makeText(requireContext(), workInfo.getOutputData().getString(Constants.REQUEST_ERROR), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                final boolean phoneVerified = workInfo.getOutputData().getBoolean(Constants.PHONE_VERIFIED, false);
+                final String phone = workInfo.getOutputData().getString(Constants.PHONE);
 
-        authViewModel = new ViewModelProvider(getViewModelStore(), factory).get(AuthViewModel.class);
+                SharedPrefs.getInstance(requireContext()).putString(Constants.PHONE, phone);
+                SharedPrefs.getInstance(requireContext()).putBoolean(Constants.PHONE_VERIFIED, phoneVerified);
+
+                pinViewModel.checkPinAssigned();
+                return;
+            }
+            progressBar.setVisibility(View.VISIBLE);
+            signInBtn.setEnabled(false);
+            signInBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.btn_locked, null));
+        });
+
+        pinViewModel.getCheckPinAssignedResult(requireContext()).observe(getViewLifecycleOwner(), workInfo -> {
+            if (workInfo.getState() == WorkInfo.State.FAILED || workInfo.getState() == WorkInfo.State.CANCELLED) {
+                progressBar.setVisibility(View.GONE);
+                signInBtn.setEnabled(true);
+                signInBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.btn_purple, null));
+                Toast.makeText(requireContext(), workInfo.getOutputData().getString(Constants.REQUEST_ERROR), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                progressBar.setVisibility(View.GONE);
+                signInBtn.setEnabled(true);
+                signInBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.btn_purple, null));
+                //user registered
+                if (!TextUtils.isEmpty(SharedPrefs.getInstance(requireContext()).getString(Constants.BEARER_TOKEN))
+                        && !TextUtils.isEmpty(SharedPrefs.getInstance(requireContext()).getString(Constants.PHONE))
+                        && SharedPrefs.getInstance(requireContext()).getBoolean(Constants.PHONE_VERIFIED)) {
+                    startActivity(new Intent(requireContext(), MainActivity.class).putExtra(Constants.PIN_ASSIGNED,
+                            workInfo.getOutputData().getBoolean(Constants.PIN_ASSIGNED, false)));
+                    requireActivity().overridePendingTransition(0, 0);
+                    requireActivity().finish();
+                    return;
+                }
+                NavHostFragment.findNavController(InputPhoneFragment.this)
+                        .navigate(InputPhoneFragmentDirections
+                                .actionInputPhoneFragmentToInputSmsFragment()
+                                .setPhone(SharedPrefs.getInstance(requireContext()).getString(Constants.PHONE)));
+                return;
+            }
+            progressBar.setVisibility(View.VISIBLE);
+            signInBtn.setEnabled(false);
+            signInBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.btn_locked, null));
+        });
     }
 
     private static final String TAG = InputPhoneFragment.class.toString();

@@ -72,10 +72,6 @@ public class InitializationFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        final AuthViewModelFactory authViewModelFactory = new AuthViewModelFactory(requireContext());
-        final AuthViewModel authViewModel = new ViewModelProvider(getViewModelStore(), authViewModelFactory).get(AuthViewModel.class);
-        authViewModel.fetchCountryList();
     }
 
     private static final String TAG = InitializationFragment.class.toString();

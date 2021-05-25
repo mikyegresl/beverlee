@@ -1,5 +1,7 @@
 package uz.alex.its.beverlee.api;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import org.jetbrains.annotations.NotNull;
@@ -22,13 +24,10 @@ public class AuthInterceptor implements Interceptor {
     public Response intercept(@NotNull Chain chain) throws IOException {
         return chain.proceed(chain.request().newBuilder()
                 .header(AUTHORIZATION_HEADER, "Bearer " + bearerToken)
-                .header(CONTENT_TYPE_HEADER, CONTENT_TYPE_VALUE)
                 .build());
     }
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String CONTENT_TYPE_HEADER = "Content-Type";
-    private static final String CONTENT_TYPE_VALUE = "application/json; charset=UTF-8;";
 
     private static final String TAG = AuthInterceptor.class.toString();
 }

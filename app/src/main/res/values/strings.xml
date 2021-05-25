@@ -1,6 +1,7 @@
 <resources>
     <!-- server constants -->
     <string name="server_url">https://beverleebank.net/</string>
+    <string name="dev_server_url">https://test.beverleebank.net</string>
     <!-- fragment labels -->
     <string name="init_fragment">Init Fragment</string>
     <string name="input_phone_fragment">Input Phone Fragment</string>
@@ -67,32 +68,27 @@
     <string name="monitoring">Мониторинг</string>
     <string name="cards">Карты</string>
     <string name="contact_name">Георгий Павлович</string>
+    <string name="contact_id">ID %d</string>
     <string name="balance">Баланс счета</string>
     <string name="current_balance">$ %s</string>
     <string name="replenish">Пополнить</string>
     <string name="withdraw">Вывести</string>
     <string name="profit">Доходы за май</string>
-    <string name="profit_summary">+ 1 200,00 $</string>
-    <string name="master_card_name">Master Card Yandex</string>
-    <string name="visa_card_name">Visa Card Tinkoff</string>
-    <string name="master_card_number">4108 59** **** 8260</string>
-    <string name="visa_card_number">4000 12** **** 6580</string>
     <string name="advert_content">Выводите ваши"\n"средства, на карту"\n"Mastercard под 0%</string>
     <!-- monitoring -->
     <string name="monitoring_header">Мониторинг счета</string>
     <string name="income">Доходы</string>
-    <string name="income_may">Доходы за Май</string>
     <string name="expenditure">Траты</string>
-    <string name="received_200">Получено 200 $</string>
-    <string name="debit_200">Пополнение 200 $</string>
-    <string name="bonus_200">Бонусы 200 $</string>
+    <string name="income_or_expenditure">%1$s за </string>
+    <string name="month_name">%s</string>
+    <string name="monthly_balance">%1$s <b>%2$.2f $</b></string>
     <string name="bonus">Бонус</string>
     <string name="beverlee">BEVERLee</string>
     <string name="received">Получено</string>
     <string name="vladislav_romanov">Владислав Романов</string>
     <string name="card_number">4108 59** **** 8230</string>
     <string name="plus_200">+ 200 $</string>
-    <string name="plus_500">+ 500 $</string>
+    <string name="transaction_amount">%1$s %2$.2f $</string>
     <string name="may_12">12 мая</string>
     <string name="may_10">10 мая</string>
     <!-- contacts page -->
@@ -118,8 +114,8 @@
     <string name="withdrawal">Вывод</string>
     <string name="choose_a_card">Выберите карту</string>
     <string name="card_name">Название карты</string>
-    <string name="transfer_success">Успешный перевод!</string>
-    <string name="transfer_failure">Что-то пошло не так!</string>
+    <string name="successful_transaction">Операция успешна!</string>
+    <string name="failed_transaction">Что-то пошло не так!</string>
     <string name="send">Отправить</string>
     <string name="card_number_">Номер на карте</string>
     <string name="sender">Кому</string>
@@ -140,12 +136,14 @@
     <string name="enter_code">Введите код</string>
     <string name="search">Поиск</string>
     <string name="zero">0</string>
-    <string name="fullname_or_id">Имя, Фамилия или ID</string>
+    <string name="phone_or_id">Номер телефона или ID</string>
     <!-- profile -->
     <string name="profile">Профиль</string>
-    <string name="profile_name">Людмила Плюшкина</string>
-    <string name="identifier">Идентификатор: 21</string>
-    <string name="club_number">Клубный номер: 305</string>
+
+    <string name="profile_name">%1$s %2$s</string>
+    <string name="identifier">Идентификатор: %s</string>
+    <string name="club_number">Клубный номер: %s</string>
+
     <string name="pick_image">Выберите фото</string>
     <!-- personal data -->
     <string name="personal_data">Персональные данные</string>
@@ -195,7 +193,7 @@
         минуты попробуйте снова получить код.</string>
     <string name="city">Город</string>
     <string name="recipient_data">Данные получателя %s</string>
-    <string name="amount_with_commission">Сумма с комиссией: %d</string>
+    <string name="amount_with_commission">Сумма с комиссией: %.2f</string>
     <string name="middle_name">Отчество</string>
     <string name="middle_name_example">Рустамовна</string>
     <string name="city_example">Tashkent</string>
@@ -207,12 +205,61 @@
     <string name="news_content_example">Лекарства будущего. В современной  Японии осталось совсем немного аптек.  Их практически заменили  специализированные сети по продаже  БАДов и так называемых  категориальных лекарств. В Японии  заботятся о здоровье нации и именно  поэтому повсеместно заменили  лекарства супер-эффективными  биодобавками. Не упустите ваш шанс прикоснуться к здоровью будущего  сегодня!  Японское долголетие. Японцы издавна  славятся своим долголетием.  Восемьдесят лет для современного</string>
     <string name="news_content_expanded_example">Лекарства будущего. В современной Японии осталось совсем немного аптек. Их практически заменили специализированные сети по продаже БАДов и так называемых категориальных лекарств. В Японии заботятся о здоровье нации и именно поэтому повсеместно заменили лекарства супер-эффективными биодобавками. Не упустите ваш шанс прикоснуться к здоровью будущего сегодня! Японское долголетие. Японцы издавна славятся своим долголетием. Восемьдесят лет для современного японца — вполне обычный возраст. Во основном такая продолжительность жизни достигается именно благодаря биодобавкам. Объем японского рынка БАДов в 2010 году превысил 7 млрд. долларов и фактически все эти биодобавки произведены в Японии. Японцы не доверяют ни американским, ни европейским аналогам. Они покупают лишь проверенные и по-настоящему действенные препараты.</string>
     <string name="news_more"><u>Подробнее</u></string>
+
+    <!--success-->
+    <string name="success_data_safe">Данные изменены успешно!</string>
+
     <!--errors-->
     <string name="error_wrong_pin">Пароли не совпадают</string>
     <string name="error_face_id">Не принято!</string>
     <string name="error_fingerprint">Отпечаток не принят!"\n"Попробуйте снова.</string>
     <string name="error_get_balance">Не удалось загрузить данные</string>
-    <string name="error_check_internet">Ошибка! Проверьте Интернет соединение</string>
+    <string name="error_check_internet">Ошибка!\nПроверьте Интернет соединение...</string>
     <string name="error_unknown">Произошла внутренняя ошибка</string>
-    <string name="pin_assign_error">Ошибка при создании пароля</string>
+    <string name="error_pin_asign">Ошибка при создании пароля</string>
+    <string name="not_assigned">не задано</string>
+    <string name="note">Примечание</string>
+    <string name="optional">небязательно</string>
+    <string name="submit">Подтвердить</string>
+    <string name="error_transfer_empty_code">Укажите код подтверждения</string>
+    <string name="save_contact">Сохранить контакт</string>
+    <string name="error_old_password_empty">Укажите текущий пароль</string>
+    <string name="error_new_password_empty">Укажите новый пароль</string>
+    <string name="error_new_password_confirm_empty">Подтвердите новый пароль</string>
+    <string name="error_password_mismatch_empty">Пароли не совпадают</string>
+    <string name="withdrawal_type">Способ вывода</string>
+    <string name="commission_rate">%1$d%%</string>
+    <string name="empty">Пусто</string>
+    <string name="contact_list_empty">Список контактов пуст</string>
+
+    <string name="recipient_card_number">Номер карты получателя %s</string>
+    <string name="recipient_wallet_number">Номер кошелька получателя %s</string>
+    <string name="withdrawal_type_card">card</string>
+    <string name="withdrawal_type_wallet">electronic</string>
+    <string name="withdrawal_type_transfer">transfer</string>
+    <string name="purchase">Покупка</string>
+    <string name="payment">Платеж</string>
+    <string name="transaction_date">%s</string>
+    <string name="transaction_from">%1$s %2$s</string>
+    <string name="monthly_summary">%1$s %2$.2f $</string>
+    <string name="december">Декабрь</string>
+    <string name="november">Ноябрь</string>
+    <string name="october">Октябрь</string>
+    <string name="september">Сентябрь</string>
+    <string name="august">Август</string>
+    <string name="july">Июль</string>
+    <string name="june">Июнь</string>
+    <string name="may">Май</string>
+    <string name="april">Апрель</string>
+    <string name="march">Март</string>
+    <string name="february">Февраль</string>
+    <string name="january">Январь</string>
+    <string name="monitoring_no_data">Нет данных</string>
+    <string name="pick_period">Выберите период</string>
+    <string name="master_card">mastercard</string>
+    <string name="visa_card">visa</string>
+    <string name="reload_app">Перезагрузить</string>
+    <string name="delete_avatar">Удалить фото</string>
+    <string name="error_phone_not_verified">Подтвердите номер телефона</string>
+    <string name="error_phone_wrong_input">Количество символов в поле Телефон должно быть не менее 11.</string>
 </resources>

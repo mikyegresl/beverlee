@@ -10,9 +10,12 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.work.WorkInfo;
 
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
@@ -29,24 +32,32 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import uz.alex.its.beverlee.R;
 import uz.alex.its.beverlee.model.DeviceDisplay;
+import uz.alex.its.beverlee.utils.AppExecutors;
+import uz.alex.its.beverlee.utils.Constants;
+import uz.alex.its.beverlee.utils.NetworkConnectivity;
+import uz.alex.its.beverlee.viewmodel.UserViewModel;
+import uz.alex.its.beverlee.viewmodel_factory.UserViewModelFactory;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class ChangePasswordFragment extends Fragment {
-    private static final String TAG = ChangePasswordFragment.class.toString();
-    private FragmentActivity activity;
-    private Context context;
-
     private ImageView backArrowImageView;
+    private TextView errorTextView;
+    private ProgressBar progressBar;
     private EditText oldPasswordEditText;
     private EditText newPasswordEditText;
     private EditText newPasswordRepeatedEditText;
+
     private ImageView newPasswordEye;
     private ImageView newPasswordRepeatedEye;
+
     private Button saveBtn;
 
     private boolean showNewPassword = false;
@@ -61,6 +72,10 @@ public class ChangePasswordFragment extends Fragment {
     private View parentLayout;
     private RelativeLayout confirmPasswordField;
 
+    private UserViewModel userViewModel;
+
+    private NetworkConnectivity networkConnectivity;
+
     public ChangePasswordFragment() {
         // Required empty public constructor
     }
@@ -69,10 +84,10 @@ public class ChangePasswordFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getActivity() != null) {
-            activity = getActivity();
-            context = activity.getApplicationContext();
-        }
+        networkConnectivity = new NetworkConnectivity(requireContext(), AppExecutors.getInstance());
+
+        final UserViewModelFactory userFactory = new UserViewModelFactory(requireContext());
+        userViewModel = new ViewModelProvider(getViewModelStore(), userFactory).get(UserViewModel.class);
     }
 
     @Override
@@ -80,11 +95,13 @@ public class ChangePasswordFragment extends Fragment {
         final View root = inflater.inflate(R.layout.fragment_change_password, container, false);
 
         backArrowImageView = root.findViewById(R.id.back_arrow_image_view);
+        errorTextView = root.findViewById(R.id.change_password_error_text_view);
         oldPasswordEditText = root.findViewById(R.id.old_password_edit_text);
         newPasswordEditText = root.findViewById(R.id.new_password_edit_text);
         newPasswordRepeatedEditText = root.findViewById(R.id.confirm_new_password_edit_text);
         newPasswordEye = root.findViewById(R.id.new_password_eye_image_view);
         newPasswordRepeatedEye = root.findViewById(R.id.confirm_new__password_eye_image_view);
+        progressBar = root.findViewById(R.id.progress_bar);
         saveBtn = root.findViewById(R.id.save_btn);
 
         bubbleAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.bubble);
@@ -102,14 +119,14 @@ public class ChangePasswordFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         backArrowImageView.setOnClickListener(v -> {
-            if (activity.getCurrentFocus() == null) {
-                activity.getSupportFragmentManager().popBackStack();
-                return;
-            }
-            Log.i(TAG, "getCurrentFocus(): " + activity.getCurrentFocus());
-            InputMethodManager imm = (InputMethodManager)activity.getSystemService(INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
-            activity.getCurrentFocus().clearFocus();
+//            if (requireActivity().getCurrentFocus() == null) {
+//                NavHostFragment.findNavController(this).popBackStack();
+//                return;
+//            }
+//            InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(INPUT_METHOD_SERVICE);
+//            imm.hideSoftInputFromWindow(requireActivity().getCurrentFocus().getWindowToken(), 0);
+//            requireActivity().getCurrentFocus().clearFocus();
+            NavHostFragment.findNavController(this).popBackStack();
         });
 
         oldPasswordEditText.setOnFocusChangeListener((v, hasFocus) -> {
@@ -189,22 +206,74 @@ public class ChangePasswordFragment extends Fragment {
 
         saveBtn.setOnClickListener(v -> {
             saveBtn.startAnimation(bubbleAnimation);
-            saveBtn.postOnAnimationDelayed(() -> {
-                activity.getSupportFragmentManager().popBackStack();
-            }, 100);
-        });
 
-        parentLayout.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-            final ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) confirmPasswordField.getLayoutParams();
-            if (DeviceDisplay.getInstance(activity).getKeyboardHeight(parentLayout) > 500) {
-                layoutParams.bottomToTop = saveBtn.getId();
-                layoutParams.bottomMargin = DeviceDisplay.getInstance(activity).dpToPx(context, 50);
+            final String oldPassword = oldPasswordEditText.getText().toString().trim();
+            final String newPassword = newPasswordEditText.getText().toString().trim();
+            final String newPasswordConfirm = newPasswordRepeatedEditText.getText().toString().trim();
+
+            if (TextUtils.isEmpty(oldPassword)) {
+                errorTextView.setText(R.string.error_old_password_empty);
+                errorTextView.setVisibility(View.VISIBLE);
+                return;
             }
-            else if (DeviceDisplay.getInstance(activity).getKeyboardHeight(parentLayout) == 0) {
-                layoutParams.bottomToTop = -1;
-                layoutParams.bottomMargin = -1;
+            if (TextUtils.isEmpty(newPassword)) {
+                errorTextView.setText(R.string.error_new_password_empty);
+                errorTextView.setVisibility(View.VISIBLE);
+                return;
             }
-            confirmPasswordField.setLayoutParams(layoutParams);
+            if (TextUtils.isEmpty(newPasswordConfirm)) {
+                errorTextView.setText(R.string.error_new_password_confirm_empty);
+                errorTextView.setVisibility(View.VISIBLE);
+                return;
+            }
+            if (!newPassword.equals(newPasswordConfirm)) {
+                errorTextView.setText(R.string.error_password_mismatch_empty);
+                errorTextView.setVisibility(View.VISIBLE);
+                return;
+            }
+            networkConnectivity.checkInternetConnection(isConnected -> {
+                if (!isConnected) {
+                    NavHostFragment.findNavController(this).navigate(
+                            ChangePasswordFragmentDirections.actionChangePasswordFragmentToTransactionResultFragment()
+                                    .setResult(false)
+                                    .setType(Constants.RESULT_TYPE_PROFILE)
+                                    .setErrorMessage(Constants.NO_INTERNET));
+                    return;
+                }
+                userViewModel.changePassword(oldPassword, newPassword, newPasswordConfirm);
+            });
+
         });
     }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        userViewModel.getChangePasswordResult(requireContext()).observe(getViewLifecycleOwner(), workInfo -> {
+            if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                errorTextView.setVisibility(View.GONE);
+                saveBtn.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
+
+                Toast.makeText(requireContext(), R.string.success_data_safe, Toast.LENGTH_SHORT).show();
+
+                NavHostFragment.findNavController(this).popBackStack();
+
+                return;
+            }
+            if (workInfo.getState() == WorkInfo.State.FAILED || workInfo.getState() == WorkInfo.State.CANCELLED) {
+                errorTextView.setVisibility(View.VISIBLE);
+                errorTextView.setText(workInfo.getOutputData().getString(Constants.REQUEST_ERROR));
+                saveBtn.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
+                return;
+            }
+            errorTextView.setVisibility(View.GONE);
+            saveBtn.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+        });
+    }
+
+    private static final String TAG = ChangePasswordFragment.class.toString();
 }

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 
 import uz.alex.its.beverlee.R;
+import uz.alex.its.beverlee.view.UiUtils;
 
 public class CalendarFragment extends Fragment {
     private static final String TAG = CalendarFragment.class.toString();
@@ -40,6 +42,9 @@ public class CalendarFragment extends Fragment {
         // Inflate the layout for this fragment
         final View root = inflater.inflate(R.layout.fragment_calendar, container, false);
 
+        /* Bottom navigation */
+        UiUtils.hideBottomNav(requireActivity());
+
         calendar = root.findViewById(R.id.calendar);
         backArrowImageView = root.findViewById(R.id.back_arrow_image_view);
         applyBtn = root.findViewById(R.id.apply_btn);
@@ -54,9 +59,7 @@ public class CalendarFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         backArrowImageView.setOnClickListener(v -> {
-            if (getActivity() != null) {
-                getActivity().onBackPressed();
-            }
+            NavHostFragment.findNavController(this).popBackStack();
         });
 
         applyBtn.setOnClickListener(v -> {

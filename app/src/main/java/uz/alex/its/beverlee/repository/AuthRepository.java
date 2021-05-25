@@ -2,24 +2,18 @@ package uz.alex.its.beverlee.repository;
 
 import android.content.Context;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.work.Constraints;
 import androidx.work.Data;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
+import androidx.work.OverwritingInputMerger;
 import androidx.work.WorkManager;
 
-import java.util.List;
 import java.util.UUID;
 
-import uz.alex.its.beverlee.model.Country;
-import uz.alex.its.beverlee.storage.LocalDatabase;
 import uz.alex.its.beverlee.utils.Constants;
-import uz.alex.its.beverlee.worker.AssignPinWorker;
 import uz.alex.its.beverlee.worker.CheckPinAssignedWorker;
 import uz.alex.its.beverlee.worker.CheckVerifiedWorker;
-import uz.alex.its.beverlee.worker.GetCountriesWorker;
 import uz.alex.its.beverlee.worker.LoginWorker;
 import uz.alex.its.beverlee.worker.RegisterWorker;
 import uz.alex.its.beverlee.worker.SubmitVerificationWorker;
@@ -53,7 +47,7 @@ public class AuthRepository {
         return loginRequest.getId();
     }
 
-    public UUID verifyPhoneBySms() {
+    public void verifyPhoneBySms() {
         final Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .setRequiresDeviceIdle(false)
@@ -65,10 +59,9 @@ public class AuthRepository {
                 .setConstraints(constraints)
                 .build();
         WorkManager.getInstance(context).enqueue(verifyPhoneBySmsRequest);
-        return verifyPhoneBySmsRequest.getId();
     }
 
-    public UUID verifyPhoneByCall() {
+    public void verifyPhoneByCall() {
         final Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .setRequiresDeviceIdle(false)
@@ -80,8 +73,22 @@ public class AuthRepository {
                 .setConstraints(constraints)
                 .build();
         WorkManager.getInstance(context).enqueue(verifyPhoneByCallRequest);
-        return verifyPhoneByCallRequest.getId();
     }
+
+//    public UUID checkVerified() {
+//        final Constraints constraints = new Constraints.Builder()
+//                .setRequiredNetworkType(NetworkType.CONNECTED)
+//                .setRequiresDeviceIdle(false)
+//                .setRequiresStorageNotLow(false)
+//                .setRequiresCharging(false)
+//                .setRequiresBatteryNotLow(false)
+//                .build();
+//        final OneTimeWorkRequest checkVerifiedRequest = new OneTimeWorkRequest.Builder(CheckVerifiedWorker.class)
+//                .setConstraints(constraints)
+//                .build();
+//        WorkManager.getInstance(context).enqueue(checkVerifiedRequest);
+//        return checkVerifiedRequest.getId();
+//    }
 
     public UUID submitVerification(final String code) {
         final Constraints constraints = new Constraints.Builder()
@@ -130,21 +137,6 @@ public class AuthRepository {
         final OneTimeWorkRequest registerRequest = new OneTimeWorkRequest.Builder(RegisterWorker.class)
                 .setConstraints(constraints)
                 .setInputData(inputData)
-                .build();
-        WorkManager.getInstance(context).enqueue(registerRequest);
-        return registerRequest.getId();
-    }
-
-    public UUID checkPinAssigned() {
-        final Constraints constraints = new Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .setRequiresDeviceIdle(false)
-                .setRequiresStorageNotLow(false)
-                .setRequiresCharging(false)
-                .setRequiresBatteryNotLow(false)
-                .build();
-        final OneTimeWorkRequest registerRequest = new OneTimeWorkRequest.Builder(CheckPinAssignedWorker.class)
-                .setConstraints(constraints)
                 .build();
         WorkManager.getInstance(context).enqueue(registerRequest);
         return registerRequest.getId();

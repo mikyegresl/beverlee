@@ -1,6 +1,5 @@
 package uz.alex.its.beverlee.view.fragments;
 
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -23,7 +22,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import uz.alex.its.beverlee.R;
-import uz.alex.its.beverlee.model.News;
+import uz.alex.its.beverlee.model.news.NewsModel.News;
 import uz.alex.its.beverlee.utils.DateFormatter;
 import uz.alex.its.beverlee.view.UiUtils;
 import uz.alex.its.beverlee.viewmodel.NewsViewModel;
@@ -47,8 +46,6 @@ public class NewsDataFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
         if (getArguments() != null) {
             currentNews = new News(
                     NewsDataFragmentArgs.fromBundle(getArguments()).getNewsId(),
@@ -63,7 +60,7 @@ public class NewsDataFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.fragment_news_data, container, false);
 
-        UiUtils.hideBottomItems(requireActivity());
+        UiUtils.hideBottomNav(requireActivity());
 
         backImageView = root.findViewById(R.id.back_arrow_image_view);
         searchEditText = root.findViewById(R.id.news_search_edit_text);
@@ -71,15 +68,8 @@ public class NewsDataFragment extends Fragment {
         titleTextView = root.findViewById(R.id.news_title_text_view);
         dateTextView = root.findViewById(R.id.news_date_text_view);
         descriptionTextView = root.findViewById(R.id.news_description_text_view);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            titleTextView.setText(Html.fromHtml(currentNews.getTitle(), Html.FROM_HTML_MODE_COMPACT));
-            descriptionTextView.setText(Html.fromHtml(currentNews.getDescription(), Html.FROM_HTML_MODE_COMPACT));
-        }
-        else {
-            titleTextView.setText(Html.fromHtml(currentNews.getTitle()));
-            descriptionTextView.setText(Html.fromHtml(currentNews.getDescription()));
-        }
+        titleTextView.setText(Html.fromHtml(currentNews.getTitle(), Html.FROM_HTML_MODE_COMPACT));
+        descriptionTextView.setText(Html.fromHtml(currentNews.getDescription(), Html.FROM_HTML_MODE_COMPACT));
         dateTextView.setText(DateFormatter.timestampToStringDate(currentNews.getCreatedAt()));
 
         Picasso.get()

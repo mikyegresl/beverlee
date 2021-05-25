@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -19,6 +22,8 @@ import uz.alex.its.beverlee.push.NotifyManager;
 import uz.alex.its.beverlee.push.TokenReceiver;
 import uz.alex.its.beverlee.storage.SharedPrefs;
 import uz.alex.its.beverlee.utils.Constants;
+import uz.alex.its.beverlee.viewmodel.PinViewModel;
+import uz.alex.its.beverlee.viewmodel_factory.PinViewModelFactory;
 
 public class SignActivity extends AppCompatActivity {
 
@@ -28,7 +33,6 @@ public class SignActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign);
 
         final TokenReceiver tokenReceiver = new TokenReceiver(this);
-        tokenReceiver.obtainFcmToken();
 
         final NotifyManager notifyManager = new NotifyManager(this);
         notifyManager.createNotificationChannel(Constants.DEFAULT_CHANNEL_ID, Constants.DEFAULT_CHANNEL_NAME);
@@ -39,14 +43,15 @@ public class SignActivity extends AppCompatActivity {
         notifyManager.createNotificationChannel(Constants.REPLENISH_CHANNEL_ID, Constants.REPLENISH_CHANNEL_NAME);
         notifyManager.createNotificationChannel(Constants.WITHDRAWAL_CHANNEL_ID, Constants.WITHDRAWAL_CHANNEL_NAME);
 
-        Log.i(TAG, "onCreate(): bearerToken=" + SharedPrefs.getInstance(this).getString(Constants.BEARER_TOKEN));
-        Log.i(TAG, "onCreate(): phone=" + SharedPrefs.getInstance(this).getString(Constants.PHONE));
-        Log.i(TAG, "onCreate(): phoneVerified=" + SharedPrefs.getInstance(this).getBoolean(Constants.PHONE_VERIFIED));
-
+        WorkManager.getInstance(this).getWorkInfoByIdLiveData(tokenReceiver.obtainFcmToken()).observe(this, workInfo -> {
+            if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                SharedPrefs.getInstance(this).putString(Constants.FCM_TOKEN, workInfo.getOutputData().getString(Constants.FCM_TOKEN));
+            }
+        });
         if (!TextUtils.isEmpty(SharedPrefs.getInstance(this).getString(Constants.BEARER_TOKEN))
                 && !TextUtils.isEmpty(SharedPrefs.getInstance(this).getString(Constants.PHONE))
                 && SharedPrefs.getInstance(this).getBoolean(Constants.PHONE_VERIFIED)) {
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, MainActivity.class).putExtra(Constants.PIN_ASSIGNED, true));
             overridePendingTransition(0, 0);
             finish();
         }

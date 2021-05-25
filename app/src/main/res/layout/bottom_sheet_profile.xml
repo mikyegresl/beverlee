@@ -46,6 +46,17 @@
         android:fontFamily="@font/geometria_medium"
         android:textSize="17sp"
         android:paddingVertical="12dp"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/delete_avatar_option"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/delete_avatar"
+        android:textColor="@color/colorRed"
+        android:fontFamily="@font/geometria_medium"
+        android:textSize="17sp"
+        android:paddingVertical="12dp"
         android:layout_marginBottom="20dp"
         android:gravity="center"/>
 </LinearLayout>

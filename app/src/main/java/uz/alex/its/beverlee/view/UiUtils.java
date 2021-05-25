@@ -38,7 +38,7 @@ public class UiUtils {
         return (float)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, px, resource.getDisplayMetrics());
     }
 
-    public static void hideBottomItems(final FragmentActivity fragmentActivity) {
+    public static void hideBottomNav(final FragmentActivity fragmentActivity) {
         final BottomNavigationView bottomNavigationView = fragmentActivity.findViewById(R.id.bottom_nav);
         final FloatingActionButton fab = fragmentActivity.findViewById(R.id.floating_btn);
         bottomNavigationView.setVisibility(GONE);

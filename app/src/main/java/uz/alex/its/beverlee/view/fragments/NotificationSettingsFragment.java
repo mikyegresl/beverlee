@@ -6,36 +6,60 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.work.WorkInfo;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import uz.alex.its.beverlee.R;
 import uz.alex.its.beverlee.push.NotifyManager;
+import uz.alex.its.beverlee.utils.AppExecutors;
+import uz.alex.its.beverlee.utils.Constants;
+import uz.alex.its.beverlee.utils.NetworkConnectivity;
+import uz.alex.its.beverlee.viewmodel.UserViewModel;
+import uz.alex.its.beverlee.viewmodel_factory.UserViewModelFactory;
+
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class NotificationSettingsFragment extends Fragment {
-    private ImageView backArrowImageView;
-//    private Button saveBtn;
+    /* pull to refresh */
+    private SwipeRefreshLayout swipeRefreshLayout;
 
+    /* header */
+    private ImageView backArrowImageView;
+
+    /* views */
     private CheckBox notifyNewsCheckBox;
     private CheckBox notifyBonusesCheckBox;
     private CheckBox notifyIncomeCheckBox;
     private CheckBox notifyPurchaseCheckBox;
     private CheckBox notifyReplenishCheckBox;
     private CheckBox notifyWithdrawalCheckBox;
+    private TextView errorTextView;
+    private ProgressBar progressBar;
+    private Button saveBtn;
 
     private Animation bubbleAnimation;
 
     private NotifyManager notifyManager;
+
+    private UserViewModel userViewModel;
+
+    private NetworkConnectivity networkConnectivity;
 
     public NotificationSettingsFragment() {
         // Required empty public constructor
@@ -46,21 +70,24 @@ public class NotificationSettingsFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         notifyManager = new NotifyManager(requireContext());
+
+        networkConnectivity = new NetworkConnectivity(requireContext(), AppExecutors.getInstance());
+
+        final UserViewModelFactory userFactory = new UserViewModelFactory(requireContext());
+
+        userViewModel = new ViewModelProvider(getViewModelStore(), userFactory).get(UserViewModel.class);
+        userViewModel.fetchNotificationSettings();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.fragment_notification_settings, container, false);
 
+        swipeRefreshLayout = root.findViewById(R.id.swipe_refresh_layout);
         backArrowImageView = root.findViewById(R.id.back_arrow_image_view);
-//        saveBtn = root.findViewById(R.id.save_btn);
-
-        final TextView notifyNewsTextView = root.findViewById(R.id.notify_news_text_view);
-        final TextView notifyBonusesTextView = root.findViewById(R.id.notify_bonuses_text_view);
-        final TextView notifyIncomeTextView = root.findViewById(R.id.notify_income_text_view);
-        final TextView notifyPurchaseTextView = root.findViewById(R.id.notify_purchase_text_view);
-        final TextView notifyReplenishTextView = root.findViewById(R.id.notify_replenish_text_view);
-        final TextView notifyWithdrawalTextView = root.findViewById(R.id.notify_withdrawal_text_view);
+        errorTextView = root.findViewById(R.id.notification_settings_error_text_view);
+        progressBar = root.findViewById(R.id.progress_bar);
+        saveBtn = root.findViewById(R.id.save_btn);
 
         notifyNewsCheckBox = root.findViewById(R.id.notify_news_check_box);
         notifyBonusesCheckBox = root.findViewById(R.id.notify_bonuses_check_box);
@@ -68,22 +95,6 @@ public class NotificationSettingsFragment extends Fragment {
         notifyPurchaseCheckBox = root.findViewById(R.id.notify_purchase_check_box);
         notifyReplenishCheckBox = root.findViewById(R.id.notify_replenish_check_box);
         notifyWithdrawalCheckBox = root.findViewById(R.id.notify_withdrawal_check_box);
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            notifyBonusesTextView.setVisibility(View.GONE);
-            notifyIncomeTextView.setVisibility(View.GONE);
-            notifyPurchaseTextView.setVisibility(View.GONE);
-            notifyReplenishTextView.setVisibility(View.GONE);
-            notifyWithdrawalTextView.setVisibility(View.GONE);
-
-            notifyBonusesCheckBox.setVisibility(View.GONE);
-            notifyIncomeCheckBox.setVisibility(View.GONE);
-            notifyPurchaseCheckBox.setVisibility(View.GONE);
-            notifyReplenishCheckBox.setVisibility(View.GONE);
-            notifyWithdrawalCheckBox.setVisibility(View.GONE);
-
-            notifyNewsTextView.setText(R.string.notify_default);
-        }
 
         bubbleAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.bubble);
 
@@ -94,39 +105,102 @@ public class NotificationSettingsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notifyNewsCheckBox.setChecked(notifyManager.areNewsEnabled());
-            notifyBonusesCheckBox.setChecked(notifyManager.areBonusesEnabled());
-            notifyIncomeCheckBox.setChecked(notifyManager.isIncomeEnabled());
-            notifyPurchaseCheckBox.setChecked(notifyManager.isPurchaseEnabled());
-            notifyReplenishCheckBox.setChecked(notifyManager.isReplenishEnabled());
-            notifyWithdrawalCheckBox.setChecked(notifyManager.isWithdrawalEnabled());
-
-            notifyNewsCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> notifyManager.setNewsEnabled(isChecked));
-            notifyBonusesCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> notifyManager.setBonusesEnabled(isChecked));
-            notifyIncomeCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> notifyManager.setIncomeEnabled(isChecked));
-            notifyPurchaseCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> notifyManager.setPurchaseEnabled(isChecked));
-            notifyReplenishCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> notifyManager.setReplenishEnabled(isChecked));
-            notifyWithdrawalCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> notifyManager.setWithdrawalEnabled(isChecked));
-        }
-        else {
-            notifyNewsCheckBox.setChecked(notifyManager.areNotificationsEnabled());
-            notifyNewsCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> notifyManager.setNotificationsEnabled(isChecked));
-        }
-
         backArrowImageView.setOnClickListener(v -> {
-            if (getActivity() != null) {
-                getActivity().getSupportFragmentManager().popBackStack();
-            }
+//            if (getActivity() != null) {
+//                if (getActivity().getCurrentFocus() == null) {
+//                    NavHostFragment.findNavController(this).popBackStack();
+//                    return;
+//                }
+//                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(INPUT_METHOD_SERVICE);
+//                imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+//                getActivity().getCurrentFocus().clearFocus();
+//            }
+            NavHostFragment.findNavController(this).popBackStack();
         });
 
-//        saveBtn.setOnClickListener(v -> {
-//            saveBtn.startAnimation(bubbleAnimation);
-//            saveBtn.postOnAnimationDelayed(() -> {
-//                if (getActivity() != null) {
-//                    getActivity().getSupportFragmentManager().popBackStack();
-//                }
-//            }, 100);
-//        });
+        saveBtn.setOnClickListener(v -> {
+            saveBtn.startAnimation(bubbleAnimation);
+
+            networkConnectivity.checkInternetConnection(isConnected -> {
+                if (!isConnected) {
+                    NavHostFragment.findNavController(this).navigate(
+                            NotificationSettingsFragmentDirections.actionNotificationSettingsFragmentToTransactionResultFragment()
+                                    .setResult(false)
+                                    .setType(Constants.RESULT_TYPE_PROFILE)
+                                    .setErrorMessage(Constants.NO_INTERNET));
+                    return;
+                }
+                userViewModel.saveNotificationSettings(
+                        notifyNewsCheckBox.isChecked(),
+                        notifyBonusesCheckBox.isChecked(),
+                        notifyIncomeCheckBox.isChecked(),
+                        notifyPurchaseCheckBox.isChecked(),
+                        notifyReplenishCheckBox.isChecked(),
+                        notifyWithdrawalCheckBox.isChecked());
+            });
+        });
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            userViewModel.fetchNotificationSettings();
+        });
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        userViewModel.getNotificationSettings().observe(getViewLifecycleOwner(), notificationSettings -> {
+            if (notificationSettings == null) {
+                errorTextView.setVisibility(View.VISIBLE);
+                saveBtn.setVisibility(View.GONE);
+                notifyNewsCheckBox.setVisibility(View.GONE);
+                notifyBonusesCheckBox.setVisibility(View.GONE);
+                notifyIncomeCheckBox.setVisibility(View.GONE);
+                notifyPurchaseCheckBox.setVisibility(View.GONE);
+                notifyReplenishCheckBox.setVisibility(View.GONE);
+                notifyWithdrawalCheckBox.setVisibility(View.GONE);
+                return;
+            }
+            saveBtn.setVisibility(View.VISIBLE);
+            notifyNewsCheckBox.setVisibility(View.VISIBLE);
+            notifyBonusesCheckBox.setVisibility(View.VISIBLE);
+            notifyIncomeCheckBox.setVisibility(View.VISIBLE);
+            notifyPurchaseCheckBox.setVisibility(View.VISIBLE);
+            notifyReplenishCheckBox.setVisibility(View.VISIBLE);
+            notifyWithdrawalCheckBox.setVisibility(View.VISIBLE);
+
+            notifyNewsCheckBox.setChecked(notificationSettings.getNews() >= 1);
+            notifyBonusesCheckBox.setChecked(notificationSettings.getBonus() >= 1);
+            notifyIncomeCheckBox.setChecked(notificationSettings.getIncome() >= 1);
+            notifyPurchaseCheckBox.setChecked(notificationSettings.getPurchase() >= 1);
+            notifyReplenishCheckBox.setChecked(notificationSettings.getReplenish() >= 1);
+            notifyWithdrawalCheckBox.setChecked(notificationSettings.getWithdrawal() >= 1);
+
+            swipeRefreshLayout.setRefreshing(false);
+        });
+
+        userViewModel.getSaveNotificationSettingsResult(requireContext()).observe(getViewLifecycleOwner(), workInfo -> {
+            if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                progressBar.setVisibility(View.GONE);
+                saveBtn.setVisibility(View.VISIBLE);
+                errorTextView.setVisibility(View.GONE);
+
+                Toast.makeText(requireContext(), R.string.success_data_safe, Toast.LENGTH_SHORT).show();
+
+                NavHostFragment.findNavController(this).popBackStack();
+
+                return;
+            }
+            if (workInfo.getState() == WorkInfo.State.CANCELLED || workInfo.getState() == WorkInfo.State.FAILED) {
+                progressBar.setVisibility(View.GONE);
+                saveBtn.setVisibility(View.VISIBLE);
+                errorTextView.setVisibility(View.VISIBLE);
+                errorTextView.setText(workInfo.getOutputData().getString(Constants.REQUEST_ERROR));
+                return;
+            }
+            errorTextView.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+            saveBtn.setVisibility(View.GONE);
+        });
     }
 }

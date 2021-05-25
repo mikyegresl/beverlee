@@ -1,12 +1,9 @@
 package uz.alex.its.beverlee.view.fragments;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,10 +20,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.work.WorkInfo;
-import androidx.work.WorkManager;
 
 import uz.alex.its.beverlee.R;
-import uz.alex.its.beverlee.model.actor.User;
 import uz.alex.its.beverlee.storage.SharedPrefs;
 import uz.alex.its.beverlee.utils.Constants;
 import uz.alex.its.beverlee.view.CounterTask;
@@ -38,7 +33,6 @@ import uz.alex.its.beverlee.viewmodel_factory.AuthViewModelFactory;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class InputSmsFragment extends Fragment {
-    private Context context;
 
     private AuthViewModel authViewModel;
 
@@ -52,10 +46,9 @@ public class InputSmsFragment extends Fragment {
 
     private Animation bubbleAnimation;
 
-    private Resources resources;
     private CounterTask counterTask;
 
-    private User currentUser;
+    private String phone;
 
     public InputSmsFragment() { }
 
@@ -63,24 +56,17 @@ public class InputSmsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        context = requireContext();
-        resources = getResources();
-
-        if (getActivity() != null) {
-            if (getActivity().getCurrentFocus() != null) {
-                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
-                getActivity().getCurrentFocus().clearFocus();
-            }
-        }
         if (getArguments() != null) {
-            currentUser = new User(InputSmsFragmentArgs.fromBundle(getArguments()).getFirstName(),
-                    InputSmsFragmentArgs.fromBundle(getArguments()).getLastName(),
-                    InputSmsFragmentArgs.fromBundle(getArguments()).getPhone(),
-                    InputSmsFragmentArgs.fromBundle(getArguments()).getEmail(),
-                    InputSmsFragmentArgs.fromBundle(getArguments()).getCountryId(),
-                    InputSmsFragmentArgs.fromBundle(getArguments()).getCity());
+            this.phone = InputSmsFragmentArgs.fromBundle(getArguments()).getPhone();
         }
+        if (requireActivity().getCurrentFocus() != null) {
+                InputMethodManager imm = (InputMethodManager)requireActivity().getSystemService(INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(requireActivity().getCurrentFocus().getWindowToken(), 0);
+                requireActivity().getCurrentFocus().clearFocus();
+        }
+        final AuthViewModelFactory factory = new AuthViewModelFactory(requireContext());
+        authViewModel = new ViewModelProvider(getViewModelStore(), factory).get(AuthViewModel.class);
+        authViewModel.verifyPhoneBySms();
     }
 
     @Override
@@ -122,7 +108,7 @@ public class InputSmsFragment extends Fragment {
         counterTask = new CounterTask(getResources(), counterTextView, sendAgainBtn, callBtn);
         counterTask.execute();
 
-        phoneEditText.setText(currentUser.getPhone());
+        phoneEditText.setText(phone);
         phoneEditText.setOnFocusChangeListener((v, hasFocus) -> UiUtils.setFocusChange(phoneEditText, hasFocus, R.string.phone_hint));
 
         verificationCodeEditText.setOnFocusChangeListener((v, hasFocus) -> UiUtils.setFocusChange(verificationCodeEditText, hasFocus, R.string.enter_code));
@@ -140,38 +126,7 @@ public class InputSmsFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length() == 4) {
-                    WorkManager.getInstance(context).getWorkInfoByIdLiveData(authViewModel.submitVerification(s.toString())).observe(getViewLifecycleOwner(), workInfo -> {
-                        if (workInfo.getState() == WorkInfo.State.FAILED || workInfo.getState() == WorkInfo.State.CANCELLED) {
-                            Toast.makeText(context, workInfo.getOutputData().getString(Constants.REQUEST_ERROR), Toast.LENGTH_SHORT).show();
-
-                            if (counterTask != null) {
-                                if (!counterTask.isCancelled()) {
-                                    counterTask.cancel(true);
-                                }
-                                counterTask = null;
-                            }
-                            return;
-                        }
-                        if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
-                            if (counterTask != null) {
-                                if (!counterTask.isCancelled()) {
-                                    counterTask.cancel(true);
-                                }
-                                counterTask = null;
-                            }
-
-                            SharedPrefs.getInstance(context).putString(Constants.FIRST_NAME, currentUser.getFirstName());
-                            SharedPrefs.getInstance(context).putString(Constants.LAST_NAME, currentUser.getLastName());
-                            SharedPrefs.getInstance(context).putString(Constants.PHONE, currentUser.getPhone());
-                            SharedPrefs.getInstance(context).putString(Constants.EMAIL, currentUser.getEmail());
-                            SharedPrefs.getInstance(context).putLong(Constants.COUNTRY_ID, currentUser.getCountryId());
-                            SharedPrefs.getInstance(context).putString(Constants.CITY, currentUser.getCity());
-                            SharedPrefs.getInstance(context).putBoolean(Constants.PHONE_VERIFIED, true);
-
-                            startActivity(new Intent(requireActivity(), MainActivity.class));
-                            requireActivity().finish();
-                        }
-                    });
+                    authViewModel.submitVerification(s.toString());
                 }
             }
         });
@@ -186,14 +141,14 @@ public class InputSmsFragment extends Fragment {
         });
 
         sendAgainBtn.setOnClickListener(v -> {
-            sendAgainBtn.startAnimation(AnimationUtils.loadAnimation(context, R.anim.bubble));
+            sendAgainBtn.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.bubble));
 
             authViewModel.verifyPhoneBySms();
             new CounterTask(getResources(), counterTextView, sendAgainBtn, callBtn).execute();
         });
 
         callBtn.setOnClickListener(v -> {
-            callBtn.startAnimation(AnimationUtils.loadAnimation(context, R.anim.bubble));
+            callBtn.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.bubble));
 
             authViewModel.verifyPhoneByCall();
             new CounterTask(getResources(), counterTextView, sendAgainBtn, callBtn).execute();
@@ -204,17 +159,30 @@ public class InputSmsFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        final AuthViewModelFactory factory = new AuthViewModelFactory(context);
-
-        authViewModel = new ViewModelProvider(getViewModelStore(), factory).get(AuthViewModel.class);
-
-        WorkManager.getInstance(context).getWorkInfoByIdLiveData(authViewModel.verifyPhoneBySms()).observe(getViewLifecycleOwner(), workInfo -> {
+        authViewModel.getSubmitVerificationResult(requireContext()).observe(getViewLifecycleOwner(), workInfo -> {
             if (workInfo.getState() == WorkInfo.State.FAILED || workInfo.getState() == WorkInfo.State.CANCELLED) {
-                Toast.makeText(context, workInfo.getOutputData().getString(Constants.REQUEST_ERROR), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), workInfo.getOutputData().getString(Constants.REQUEST_ERROR), Toast.LENGTH_SHORT).show();
+
+                if (counterTask != null) {
+                    if (!counterTask.isCancelled()) {
+                        counterTask.cancel(true);
+                    }
+                    counterTask = null;
+                }
                 return;
             }
             if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
-                //do nothing:
+                if (counterTask != null) {
+                    if (!counterTask.isCancelled()) {
+                        counterTask.cancel(true);
+                    }
+                    counterTask = null;
+                }
+                SharedPrefs.getInstance(requireContext()).putString(Constants.PHONE, phone);
+                SharedPrefs.getInstance(requireContext()).putBoolean(Constants.PHONE_VERIFIED, true);
+
+                startActivity(new Intent(requireActivity(), MainActivity.class).putExtra(Constants.PIN_ASSIGNED, false));
+                requireActivity().finish();
             }
         });
     }

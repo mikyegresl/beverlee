@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData;
 
 import java.util.List;
 
-import uz.alex.its.beverlee.model.Push;
+import uz.alex.its.beverlee.model.notification.Push;
 import uz.alex.its.beverlee.storage.LocalDatabase;
 import uz.alex.its.beverlee.storage.dao.PushDao;
 

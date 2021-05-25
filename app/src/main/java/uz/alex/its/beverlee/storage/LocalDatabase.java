@@ -9,30 +9,23 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import uz.alex.its.beverlee.model.transaction.Card;
-import uz.alex.its.beverlee.model.actor.Contact;
-import uz.alex.its.beverlee.model.Country;
-import uz.alex.its.beverlee.model.actor.User;
-import uz.alex.its.beverlee.model.Push;
+import uz.alex.its.beverlee.model.actor.ContactModel.ContactData;
+import uz.alex.its.beverlee.model.notification.Push;
+import uz.alex.its.beverlee.model.actor.ContactModel.Contact;
 import uz.alex.its.beverlee.storage.converters.DateConverter;
-import uz.alex.its.beverlee.storage.dao.CardDao;
 import uz.alex.its.beverlee.storage.dao.ContactDao;
-import uz.alex.its.beverlee.storage.dao.CountryDao;
 import uz.alex.its.beverlee.storage.dao.PushDao;
 import uz.alex.its.beverlee.utils.Constants;
 
 @Database(entities = {
         Contact.class,
-        Card.class,
-        Country.class,
-        Push.class}, version = 4, exportSchema = false)
+        ContactData.class,
+        Push.class}, version = 8, exportSchema = false)
 @TypeConverters({ DateConverter.class })
 public abstract class LocalDatabase extends RoomDatabase {
     /* Declare dao objects here */
-    public abstract CountryDao countryDao();
-    public abstract CardDao cardDao();
-    public abstract ContactDao contactDao();
     public abstract PushDao pushDao();
+    public abstract ContactDao contactDao();
 
     private static volatile LocalDatabase instance;
 

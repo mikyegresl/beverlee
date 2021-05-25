@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.work.WorkInfo;
-import androidx.work.WorkManager;
 
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
@@ -33,6 +32,7 @@ import android.widget.Toast;
 
 import uz.alex.its.beverlee.R;
 import uz.alex.its.beverlee.model.Country;
+import uz.alex.its.beverlee.storage.SharedPrefs;
 import uz.alex.its.beverlee.utils.Constants;
 import uz.alex.its.beverlee.view.UiUtils;
 import uz.alex.its.beverlee.view.adapters.CountryAdapter;
@@ -72,6 +72,9 @@ public class SignUpFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        final AuthViewModelFactory authViewModelFactory = new AuthViewModelFactory(requireContext());
+        authViewModel = new ViewModelProvider(getViewModelStore(), authViewModelFactory).get(AuthViewModel.class);
+        authViewModel.fetchCountryList();
     }
 
     @Override
@@ -190,34 +193,7 @@ public class SignUpFragment extends Fragment {
 
             signUpBtn.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.bubble));
 
-            WorkManager.getInstance(requireContext()).getWorkInfoByIdLiveData(authViewModel.register(firstName, lastName, phone, email, countryId, city, password, passwordConfirmation)).observe(getViewLifecycleOwner(), workInfo -> {
-                if (workInfo.getState() == WorkInfo.State.FAILED || workInfo.getState() == WorkInfo.State.CANCELLED) {
-                    progressBar.setVisibility(View.GONE);
-                    signUpBtn.setEnabled(true);
-                    signUpBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.btn_purple, null));
-                    Toast.makeText(requireContext(), workInfo.getOutputData().getString(Constants.REQUEST_ERROR), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
-                    progressBar.setVisibility(View.GONE);
-                    signUpBtn.setEnabled(true);
-                    signUpBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.btn_purple, null));
-
-                    final SignUpFragmentDirections.ActionSignUpFragmentToInputSmsFragment action = SignUpFragmentDirections.actionSignUpFragmentToInputSmsFragment();
-                    action.setFirstName(firstName);
-                    action.setLastName(lastName);
-                    action.setPhone(phone);
-                    action.setEmail(email);
-                    action.setCountryId(countryId);
-                    action.setCity(city);
-                    NavHostFragment.findNavController(SignUpFragment.this).navigate(action);
-
-                    return;
-                }
-                progressBar.setVisibility(View.VISIBLE);
-                signUpBtn.setEnabled(false);
-                signUpBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.btn_locked, null));
-            });
+            authViewModel.signUp(firstName, lastName, phone, email, countryId, city, password, passwordConfirmation);
         });
 
         countrySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -237,13 +213,35 @@ public class SignUpFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        final AuthViewModelFactory authViewModelFactory = new AuthViewModelFactory(requireContext());
-
-        authViewModel = new ViewModelProvider(getViewModelStore(), authViewModelFactory).get(AuthViewModel.class);
-
         authViewModel.getCountryList().observe(getViewLifecycleOwner(), countryList -> {
             adapter.setCountryList(countryList);
             adapter.notifyDataSetChanged();
+        });
+
+        authViewModel.getSignUpResult(requireContext()).observe(getViewLifecycleOwner(), workInfo -> {
+            if (workInfo.getState() == WorkInfo.State.FAILED || workInfo.getState() == WorkInfo.State.CANCELLED) {
+                progressBar.setVisibility(View.GONE);
+                signUpBtn.setEnabled(true);
+                signUpBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.btn_purple, null));
+                Toast.makeText(requireContext(), workInfo.getOutputData().getString(Constants.REQUEST_ERROR), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                progressBar.setVisibility(View.GONE);
+                signUpBtn.setEnabled(true);
+                signUpBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.btn_purple, null));
+
+                SharedPrefs.getInstance(requireContext()).putString(Constants.BEARER_TOKEN, workInfo.getOutputData().getString(Constants.BEARER_TOKEN));
+
+                final SignUpFragmentDirections.ActionSignUpFragmentToInputSmsFragment action = SignUpFragmentDirections.actionSignUpFragmentToInputSmsFragment();
+                action.setPhone(workInfo.getOutputData().getString(Constants.PHONE));
+                NavHostFragment.findNavController(SignUpFragment.this).navigate(action);
+
+                return;
+            }
+            progressBar.setVisibility(View.VISIBLE);
+            signUpBtn.setEnabled(false);
+            signUpBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.btn_locked, null));
         });
     }
 

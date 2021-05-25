@@ -1,19 +1,19 @@
 package uz.alex.its.beverlee.view.fragments;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.work.WorkInfo;
 
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,56 +23,79 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
+import uz.alex.its.beverlee.storage.FileManager;
+import uz.alex.its.beverlee.storage.SharedPrefs;
 import uz.alex.its.beverlee.utils.Constants;
 import uz.alex.its.beverlee.R;
+import uz.alex.its.beverlee.utils.ImageProcessor;
+import uz.alex.its.beverlee.viewmodel.UserViewModel;
+import uz.alex.its.beverlee.viewmodel_factory.UserViewModelFactory;
 
+import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 public class ProfileFragment extends Fragment {
+    /* pull to refresh */
+    private SwipeRefreshLayout swipeRefreshLayout;
+
+    /* header */
     private ImageView backArrowImageView;
+
+    /* views */
+    private TextView fullNameTextView;
+    private TextView idTextView;
+    private TextView clubNumberTextView;
     private ImageView avatarImageView;
     private ImageView changeProfilePhotoImageView;
     private Button editBtn;
-    private ConstraintLayout parentLayout;
 
-    private boolean bottomSheetHidden = true;
-    private boolean imageSelected = false;
+    private Animation bubbleAnimation;
 
+    /*bottom sheet*/
     private LinearLayout bottomSheet;
     private TextView bottomSheetPersonalData;
     private TextView bottomSheetNotificationsSettings;
     private TextView bottomSheetChangePassword;
-    private BottomSheetBehavior sheetBehavior;
+    private TextView bottomSheetDeleteAvatar;
+    private BottomSheetBehavior<LinearLayout> sheetBehavior;
+    private ConstraintLayout parentLayout;
+    private ProgressBar progressBar;
 
-    private Animation bubbleAnimation;
+    private boolean bottomSheetHidden = true;
+    private boolean imageSelected = false;
+
+    private UserViewModel userViewModel;
 
     public ProfileFragment() {
         // Required empty public constructor
     }
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        final UserViewModelFactory userFactory = new UserViewModelFactory(requireContext());
+        userViewModel = new ViewModelProvider(getViewModelStore(), userFactory).get(UserViewModel.class);
+
+        userViewModel.fetchUserData();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        Log.i(TAG, "onCreateView: ");
+        swipeRefreshLayout = root.findViewById(R.id.swipe_refresh_layout);
+        fullNameTextView = root.findViewById(R.id.profile_name_text_view);
+        idTextView = root.findViewById(R.id.identifier_text_view);
+        clubNumberTextView = root.findViewById(R.id.club_number_text_view);
 
         backArrowImageView = root.findViewById(R.id.back_arrow_image_view);
         avatarImageView = root.findViewById(R.id.profile_photo_image_view);
@@ -81,16 +104,16 @@ public class ProfileFragment extends Fragment {
         parentLayout = root.findViewById(R.id.parent_layout);
 
         bubbleAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.bubble);
+        progressBar = root.findViewById(R.id.progress_bar);
 
-        if (getActivity() != null) {
-            bottomSheet = getActivity().findViewById(R.id.bottom_sheet_profile);
-            bottomSheetPersonalData = getActivity().findViewById(R.id.personal_data_option);
-            bottomSheetNotificationsSettings = getActivity().findViewById(R.id.notifications_option);
-            bottomSheetChangePassword = getActivity().findViewById(R.id.change_password_option);
+        bottomSheet = requireActivity().findViewById(R.id.bottom_sheet_profile);
+        bottomSheetPersonalData = requireActivity().findViewById(R.id.personal_data_option);
+        bottomSheetNotificationsSettings = requireActivity().findViewById(R.id.notifications_option);
+        bottomSheetChangePassword = requireActivity().findViewById(R.id.change_password_option);
+        bottomSheetDeleteAvatar = requireActivity().findViewById(R.id.delete_avatar_option);
 
-            sheetBehavior = BottomSheetBehavior.from(bottomSheet);
-            sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        }
+        sheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
         return root;
     }
@@ -99,8 +122,6 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Log.i(TAG, "onViewCreated: ");
-        
         sheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -139,49 +160,43 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        avatarImageView.setOnClickListener(v -> {
-
-        });
-
         changeProfilePhotoImageView.setOnClickListener(v -> {
             final Intent pickImageIntent = new Intent();
             pickImageIntent.setAction(Intent.ACTION_GET_CONTENT);
             pickImageIntent.setType("image/*");
-//            pickImageIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivityForResult(Intent.createChooser(pickImageIntent, getString(R.string.pick_image)), Constants.INTENT_PICK_IMAGE);
+            startActivityForResult(Intent.createChooser(pickImageIntent, getString(R.string.pick_image)), Constants.REQUEST_CODE_PICK_IMAGE);
         });
 
         bottomSheetPersonalData.setOnClickListener(v -> {
-            if (getActivity() != null) {
-                final Fragment personalDataFragment = new PersonalDataFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).add(R.id.profile_fragment_container, personalDataFragment).commit();
-                editBtn.setVisibility(View.VISIBLE);
-                sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                imageSelected = false;
-                bottomSheetHidden = true;
-            }
+            NavHostFragment.findNavController(this).navigate(R.id.action_profileFragment_to_personalDataFragment);
+            editBtn.setVisibility(View.VISIBLE);
+            sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            imageSelected = false;
+            bottomSheetHidden = true;
         });
 
         bottomSheetNotificationsSettings.setOnClickListener(v -> {
-            if (getActivity() != null) {
-                final Fragment notificationSettingsFragment = new NotificationSettingsFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).add(R.id.profile_fragment_container, notificationSettingsFragment).commit();
-                editBtn.setVisibility(View.VISIBLE);
-                sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                imageSelected = false;
-                bottomSheetHidden = true;
-            }
+            NavHostFragment.findNavController(this).navigate(R.id.action_profileFragment_to_notificationSettingsFragment);
+            editBtn.setVisibility(View.VISIBLE);
+            sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            imageSelected = false;
+            bottomSheetHidden = true;
         });
 
         bottomSheetChangePassword.setOnClickListener(v -> {
-            if (getActivity() != null) {
-                final Fragment changePasswordFragment = new ChangePasswordFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).add(R.id.profile_fragment_container, changePasswordFragment).commit();
-                editBtn.setVisibility(View.VISIBLE);
-                sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                imageSelected = false;
-                bottomSheetHidden = true;
-            }
+            NavHostFragment.findNavController(this).navigate(R.id.action_profileFragment_to_changePasswordFragment);
+            editBtn.setVisibility(View.VISIBLE);
+            sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            imageSelected = false;
+            bottomSheetHidden = true;
+        });
+
+        bottomSheetDeleteAvatar.setOnClickListener(v -> {
+            userViewModel.deleteAvatar();
+            editBtn.setVisibility(View.VISIBLE);
+            sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            imageSelected = false;
+            bottomSheetHidden = true;
         });
 
         parentLayout.setOnClickListener(v -> {
@@ -214,126 +229,98 @@ public class ProfileFragment extends Fragment {
                 getActivity().onBackPressed();
             }
         });
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            userViewModel.fetchUserData();
+        });
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        Log.i(TAG, "onStart: ");
-    }
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.i(TAG, "onResume: ");
+        userViewModel.getUserData().observe(getViewLifecycleOwner(), user -> {
+            fullNameTextView.setText(user == null ? getString(R.string.not_assigned) : getString(R.string.profile_name, user.getFirstName(), user.getLastName()));
+            idTextView.setText(user == null || user.getId() <= 0 ? getString(R.string.identifier, getString(R.string.not_assigned)) : getString(R.string.identifier, String.valueOf(user.getId())
+            ));
+            clubNumberTextView.setText(user == null || user.getClubNumber() <= 0 ? getString(R.string.club_number, getString(R.string.not_assigned)) : getString(R.string.club_number, String.valueOf(user.getClubNumber())));
+
+            if (user == null) {
+                return;
+            }
+
+            SharedPrefs.getInstance(requireContext()).saveUserData(user);
+
+            if (user.getPhotoUrl() != null) {
+                avatarImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                Picasso.get()
+                        .load(getString(R.string.dev_server_url) + user.getPhotoUrl())
+                        .noPlaceholder()
+                        .fit()
+                        .centerCrop()
+                        .into(avatarImageView);
+            }
+            swipeRefreshLayout.setRefreshing(false);
+        });
+
+        userViewModel.getDeleteAvatarResult(requireContext()).observe(getViewLifecycleOwner(), workInfo -> {
+            if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                progressBar.setVisibility(View.GONE);
+                editBtn.setEnabled(true);
+                backArrowImageView.setEnabled(true);
+                changeProfilePhotoImageView.setEnabled(true);
+
+                avatarImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                avatarImageView.setImageBitmap(null);
+                avatarImageView.setImageResource(R.drawable.ic_crown_big);
+
+                Toast.makeText(requireContext(), "Фото успешно удалено", Toast.LENGTH_SHORT).show();
+
+                return;
+            }
+            if (workInfo.getState() == WorkInfo.State.FAILED || workInfo.getState() == WorkInfo.State.CANCELLED) {
+                progressBar.setVisibility(View.GONE);
+                editBtn.setEnabled(true);
+                backArrowImageView.setEnabled(true);
+                changeProfilePhotoImageView.setEnabled(true);
+
+                Toast.makeText(requireContext(), "Произошла ошибка...", Toast.LENGTH_SHORT).show();
+
+                return;
+            }
+            progressBar.setVisibility(View.VISIBLE);
+            editBtn.setEnabled(false);
+            backArrowImageView.setEnabled(false);
+            changeProfilePhotoImageView.setEnabled(false);
+        });
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        if (resultCode == RESULT_CANCELED) {
+            Log.e(TAG, "onActivityResult(): CANCELLED");
+            return;
+        }
         if (resultCode == RESULT_OK) {
-            if (requestCode == Constants.INTENT_PICK_IMAGE) {
+            if (requestCode == Constants.REQUEST_CODE_PICK_IMAGE) {
                 if (data == null) {
                     Log.e(TAG, "onActivityResult(): data is NULL");
-                    Toast.makeText(getContext(), "Ошибка: пустой ответ", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                InputStream in = null;
-                ExifInterface exifInterface = null;
-                Matrix matrix = null;
-                Bitmap src = null;
-
                 final Uri selectedImageURI = data.getData();
+                final Bitmap rotatedBitmap =
+                        ImageProcessor.rotate(
+                                ImageProcessor.scaleDown(
+                                ImageProcessor.getBitmapFromUri(
+                                        requireContext(),
+                                        selectedImageURI)),
+                                requireContext(), selectedImageURI);
+                avatarImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                avatarImageView.setImageBitmap(rotatedBitmap);
 
-                try {
-                    src = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), selectedImageURI);
-                }
-                catch (IOException e) {
-                    Log.e(TAG, "onActivityResult(): ", e);
-                }
-
-                try {
-                    in = requireContext().getContentResolver().openInputStream(selectedImageURI);
-                     exifInterface = new ExifInterface(in);
-                }
-                catch (IOException e) {
-                    Log.e(TAG, "onActivityResult(): ", e);
-                }
-                finally {
-                    if (in != null) {
-                        try {
-                            in.close();
-                        }
-                        catch (IOException e) {
-                            Log.e(TAG, "onActivityResult(): ", e);
-                        }
-                    }
-                }
-                if (exifInterface == null) {
-                    Log.e(TAG, "onActivityResult(): exifInterface is NULL");
-                    return;
-                }
-
-                int rotation = 0;
-                int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-
-                switch (orientation) {
-                    case ExifInterface.ORIENTATION_ROTATE_90: {
-                        rotation = 90;
-                        break;
-                    }
-                    case ExifInterface.ORIENTATION_ROTATE_180: {
-                        rotation = 180;
-                        break;
-                    }
-                    case ExifInterface.ORIENTATION_ROTATE_270: {
-                        rotation = 270;
-                        break;
-                    }
-                }
-                matrix = new Matrix();
-
-                if (rotation > 0) {
-                    matrix.postRotate(rotation);
-                }
-                final Bitmap adjustedBitmap = Bitmap.createBitmap(
-                        src,
-                        0,
-                        0,
-                        src.getWidth(),
-                        src.getHeight(),
-                        matrix,
-                        true);
-
-                OutputStream outputStream = null;
-                Uri finalImgUri = null;
-
-                try {
-                    finalImgUri = Uri.fromFile(File.createTempFile("temp_file_name", ".jpg", requireContext().getCacheDir()));
-                    outputStream = requireContext().getContentResolver().openOutputStream(finalImgUri);
-                    adjustedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-                }
-                catch (Exception e) {
-                    Log.e(TAG,"onActivityResult():", e);
-                }
-                finally {
-                    try {
-                        if (outputStream != null) {
-                            outputStream.close();
-                        }
-                    }
-                    catch (IOException e) {
-                        Log.e(TAG, "onActivityResult(): ", e);
-                    }
-                }
-
-                Picasso.get()
-                        .load(finalImgUri)
-                        .noPlaceholder()
-                        .fit()
-                        .centerCrop()
-                        .into(avatarImageView);
+                userViewModel.uploadAvatarAsync(FileManager.getInstance(requireContext()).storeBitmap(rotatedBitmap));
             }
         }
     }

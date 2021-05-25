@@ -38,6 +38,17 @@
         android:layout_marginStart="8dp"
         android:contentDescription="@string/transfer"/>
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:indeterminateTint="@color/colorPurple"
+        android:visibility="gone"/>
+
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll_layout"
         android:layout_width="0dp"
@@ -247,7 +258,6 @@
                 android:autofillHints="@string/email_example"
                 android:inputType="textEmailAddress"
                 android:hint="@string/email"
-                android:maxLength="16"
                 android:textColorHint="@color/colorLightGrey"
                 android:paddingStart="17dp"
                 android:paddingEnd="17dp"/>
@@ -343,7 +353,6 @@
                 android:autofillHints="@string/address"
                 android:inputType="textCapWords"
                 android:hint="@string/address"
-                android:maxLength="16"
                 android:textColorHint="@color/colorLightGrey"
                 android:paddingStart="17dp"
                 android:paddingEnd="17dp"/>
@@ -363,7 +372,7 @@
                 android:textColor="#fff"
                 android:textSize="17sp"
                 android:layout_margin="50dp" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

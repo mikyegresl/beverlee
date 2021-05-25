@@ -65,6 +65,42 @@ public class RegisterParams {
         this.deviceName = Cryptographic.md5(phone + Build.MANUFACTURER + Build.MODEL);;
     }
 
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public long getCountryId() {
+        return countryId;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getPasswordConfirmation() {
+        return passwordConfirmation;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
+    }
+
     @NonNull
     @Override
     public String toString() {

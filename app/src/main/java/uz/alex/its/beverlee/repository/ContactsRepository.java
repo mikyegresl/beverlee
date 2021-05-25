@@ -1,96 +1,110 @@
 package uz.alex.its.beverlee.repository;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.provider.ContactsContract;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 import java.util.List;
+import java.util.UUID;
 
-import uz.alex.its.beverlee.R;
-import uz.alex.its.beverlee.model.actor.Contact;
+import retrofit2.Callback;
+import uz.alex.its.beverlee.api.RetrofitClient;
+import uz.alex.its.beverlee.model.actor.ContactModel.ContactData;
+import uz.alex.its.beverlee.model.actor.ContactModel;
 import uz.alex.its.beverlee.storage.LocalDatabase;
-import uz.alex.its.beverlee.storage.dao.ContactDao;
+import uz.alex.its.beverlee.utils.Constants;
+import uz.alex.its.beverlee.worker.AddToFavsWorker;
+import uz.alex.its.beverlee.worker.DeleteContactWorker;
+import uz.alex.its.beverlee.worker.RemoveFromFavsWorker;
+import uz.alex.its.beverlee.model.actor.ContactModel.Contact;
 
 public class ContactsRepository {
     private final Context context;
-    private static final int CONTACT_ID_INDEX = 0;
-    private static final int CONTACT_KEY_INDEX = 1;
-    private static final String SELECTION = ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " LIKE ?";
-
-    private final ContactDao contactDao;
-
-    private static final String[] FROM_COLUMNS = {
-            ContactsContract.Contacts.DISPLAY_NAME_PRIMARY
-    };
-    private static final int[] TO_IDS = {
-            R.id.contact_name
-    };
-    private static final String[] PROJECTION = {
-            ContactsContract.Contacts._ID,
-            ContactsContract.Contacts.LOOKUP_KEY,
-            ContactsContract.Contacts.DISPLAY_NAME_PRIMARY
-    };
-
-    private String searchString;
-    private String[] selectionArgs = { searchString };
+    private final LocalDatabase localDatabase;
 
     public ContactsRepository(final Context context) {
         this.context = context;
-        final LocalDatabase database = LocalDatabase.getInstance(context);
-        this.contactDao = database.contactDao();
+        this.localDatabase = LocalDatabase.getInstance(context);
     }
 
-    public void loadContacts() {
-        final Cursor cursor = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
-
-        Log.i(TAG, "fetchContacts(): cursor.getCount() is " + cursor.getCount());
-
-        if ((cursor != null ? cursor.getCount() : 0) > 0) {
-            while (cursor.moveToNext()) {
-                final String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                final String phone = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                insertContact(new Contact(0, name, phone));
-            }
-        }
-        if (cursor != null) {
-            cursor.close();
-        }
+    public void fetchContactList(final String searchQuery, final Integer page, final Integer perPage, final Callback<ContactModel> callback) {
+        RetrofitClient.getInstance(context).setAuthorizationHeader(context);
+        RetrofitClient.getInstance(context).getContactList(searchQuery, page, perPage, callback);
     }
 
-    //todo: fetch Contacts from book to Room
-
-    /* room queries */
-    void insertContact(final Contact contact) {
-        new Thread(() -> {
-            final long id = contactDao.insertContact(contact);
-        }).start();
+    public void fetchContactData(final long contactId, final Callback<ContactModel> callback) {
+        RetrofitClient.getInstance(context).setAuthorizationHeader(context);
+        RetrofitClient.getInstance(context).getContactData(contactId, callback);
     }
 
-    void insertContactList(final List<Contact> contactList) {
-        new Thread(() -> { contactDao.insertContactList(contactList); }).start();
+    public UUID deleteContact(final long id) {
+        final Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresDeviceIdle(false)
+                .setRequiresStorageNotLow(false)
+                .setRequiresCharging(false)
+                .setRequiresBatteryNotLow(false)
+                .build();
+        final Data inputData = new Data.Builder()
+                .putLong(Constants.ID, id)
+                .build();
+        final OneTimeWorkRequest deleteContactRequest = new OneTimeWorkRequest.Builder(DeleteContactWorker.class)
+                .setConstraints(constraints)
+                .setInputData(inputData)
+                .build();
+        WorkManager.getInstance(context).enqueue(deleteContactRequest);
+        return deleteContactRequest.getId();
     }
 
-    void deleteContact(final Contact contact) {
-        new Thread(() -> { contactDao.deleteContact(contact); }).start();
+    public UUID addToFavs(final ContactData contact) {
+        final Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+                .setRequiresDeviceIdle(false)
+                .setRequiresStorageNotLow(true)
+                .setRequiresCharging(false)
+                .setRequiresBatteryNotLow(false)
+                .build();
+        final Data inputData = new Data.Builder()
+                .putLong(Constants.ID, contact.getId())
+                .putLong(Constants.CONTACT_ID, contact.getId())
+                .putString(Constants.CONTACT_FULL_NAME, contact.getContact().getFio())
+                .build();
+        final OneTimeWorkRequest addToFavsRequest = new OneTimeWorkRequest.Builder(AddToFavsWorker.class)
+                .setConstraints(constraints)
+                .setInputData(inputData)
+                .build();
+        WorkManager.getInstance(context).enqueue(addToFavsRequest);
+        return addToFavsRequest.getId();
     }
 
-    void deleteContactList(final List<Contact> contactList) {
-        new Thread(() -> { contactDao.deleteContactList(contactList); }).start();
+    public UUID removeFromFavs(final ContactData contact) {
+        final Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+                .setRequiresDeviceIdle(false)
+                .setRequiresStorageNotLow(false)
+                .setRequiresCharging(false)
+                .setRequiresBatteryNotLow(false)
+                .build();
+        final Data inputData = new Data.Builder()
+                .putLong(Constants.ID, contact.getId())
+                .putLong(Constants.CONTACT_ID, contact.getId())
+                .putString(Constants.CONTACT_FULL_NAME, contact.getContact().getFio())
+                .build();
+        final OneTimeWorkRequest removeFromFavsRequest = new OneTimeWorkRequest.Builder(RemoveFromFavsWorker.class)
+                .setConstraints(constraints)
+                .setInputData(inputData)
+                .build();
+        WorkManager.getInstance(context).enqueue(removeFromFavsRequest);
+        return removeFromFavsRequest.getId();
     }
 
-    public LiveData<List<Contact>> selectAllContacts() {
-        return contactDao.selectAllContacts();
-    }
-
-    public LiveData<Contact> selectContactByName(final String name) {
-        return contactDao.selectContactByName(name);
-    }
-
-    public LiveData<Contact> selectContactByPhone(final String phone) {
-        return contactDao.selectContactByPhone(phone);
+    public LiveData<List<ContactData>> getFavContactList() {
+        return localDatabase.contactDao().selectAllContacts();
     }
 
     private static final String TAG = ContactsRepository.class.toString();

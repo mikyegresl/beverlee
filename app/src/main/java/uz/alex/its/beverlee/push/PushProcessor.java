@@ -19,7 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import uz.alex.its.beverlee.model.Push;
+import uz.alex.its.beverlee.model.notification.Push;
 import uz.alex.its.beverlee.storage.LocalDatabase;
 import uz.alex.its.beverlee.utils.Constants;
 

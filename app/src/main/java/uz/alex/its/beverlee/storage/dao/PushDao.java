@@ -8,7 +8,7 @@ import androidx.room.Query;
 
 import java.util.List;
 
-import uz.alex.its.beverlee.model.Push;
+import uz.alex.its.beverlee.model.notification.Push;
 
 @Dao
 public interface PushDao {

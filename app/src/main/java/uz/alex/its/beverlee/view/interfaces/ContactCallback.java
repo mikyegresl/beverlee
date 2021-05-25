@@ -1,10 +1,8 @@
 package uz.alex.its.beverlee.view.interfaces;
 
-import uz.alex.its.beverlee.model.actor.Contact;
-import uz.alex.its.beverlee.view.adapters.ContactListHorizontalAdapter;
-import uz.alex.its.beverlee.view.adapters.ContactListVerticalAdapter;
+import uz.alex.its.beverlee.model.actor.ContactModel.ContactData;
+import uz.alex.its.beverlee.view.adapters.ContactAdapter;
 
 public interface ContactCallback {
-    void onVerticalContactSelected(final Contact contact, final ContactListVerticalAdapter.ContactVerticalViewHolder holder);
-    void onHorizontalContactSelected(final Contact contact, final ContactListHorizontalAdapter.ContactHorizontalViewHolder holder);
+    void onContactSelected(final ContactData contact, final ContactAdapter.ContactViewHolder holder);
 }

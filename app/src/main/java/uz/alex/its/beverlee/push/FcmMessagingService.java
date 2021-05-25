@@ -13,8 +13,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.concurrent.ExecutionException;
 
-import uz.alex.its.beverlee.model.Push;
-import uz.alex.its.beverlee.storage.SharedPrefs;
+import uz.alex.its.beverlee.model.notification.Push;
 import uz.alex.its.beverlee.utils.Constants;
 
 public class FcmMessagingService extends FirebaseMessagingService {

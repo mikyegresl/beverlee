@@ -5,7 +5,9 @@ import androidx.annotation.NonNull;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class TransferFundsParams {
+import java.io.Serializable;
+
+public class TransferFundsParams implements Serializable {
     @Expose
     @SerializedName("recipient_id")
     private final long recipientId;

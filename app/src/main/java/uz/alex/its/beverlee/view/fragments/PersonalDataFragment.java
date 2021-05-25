@@ -7,7 +7,10 @@ import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.work.WorkInfo;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,14 +20,19 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import uz.alex.its.beverlee.R;
-import uz.alex.its.beverlee.model.actor.User;
+import uz.alex.its.beverlee.model.Country;
+import uz.alex.its.beverlee.model.actor.UserModel.User;
 import uz.alex.its.beverlee.storage.SharedPrefs;
+import uz.alex.its.beverlee.utils.AppExecutors;
 import uz.alex.its.beverlee.utils.Constants;
+import uz.alex.its.beverlee.utils.NetworkConnectivity;
 import uz.alex.its.beverlee.view.UiUtils;
-import uz.alex.its.beverlee.viewmodel.AuthViewModel;
-import uz.alex.its.beverlee.viewmodel_factory.AuthViewModelFactory;
+import uz.alex.its.beverlee.viewmodel.UserViewModel;
+import uz.alex.its.beverlee.viewmodel_factory.UserViewModelFactory;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
@@ -40,12 +48,17 @@ public class PersonalDataFragment extends Fragment {
     private EditText cityEditText;
     private EditText addressEditText;
     private Button saveBtn;
+    private ProgressBar progressBar;
 
     private Animation bubbleAnimation;
 
     private NestedScrollView nestedScrollView;
 
     private User currentUser;
+
+    private UserViewModel userViewModel;
+
+    private NetworkConnectivity networkConnectivity;
 
     public PersonalDataFragment() {
         // Required empty public constructor
@@ -55,15 +68,29 @@ public class PersonalDataFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        currentUser = new User(SharedPrefs.getInstance(requireContext()).getString(Constants.FIRST_NAME),
+        currentUser = new User(
+                SharedPrefs.getInstance(requireContext()).getLong(Constants.USER_ID),
+                SharedPrefs.getInstance(requireContext()).getLong(Constants.CLUB_NUMBER),
+                SharedPrefs.getInstance(requireContext()).getString(Constants.FIRST_NAME),
                 SharedPrefs.getInstance(requireContext()).getString(Constants.LAST_NAME),
+                SharedPrefs.getInstance(requireContext()).getString(Constants.MIDDLE_NAME),
                 SharedPrefs.getInstance(requireContext()).getString(Constants.PHONE),
                 SharedPrefs.getInstance(requireContext()).getString(Constants.EMAIL),
-                SharedPrefs.getInstance(requireContext()).getLong(Constants.COUNTRY_ID),
-                SharedPrefs.getInstance(requireContext()).getString(Constants.CITY));
-        currentUser.setMiddleName(SharedPrefs.getInstance(requireContext()).getString(Constants.MIDDLE_NAME));
-        currentUser.setPosition(SharedPrefs.getInstance(requireContext()).getString(Constants.POSITION));
-        currentUser.setAddress(SharedPrefs.getInstance(requireContext()).getString(Constants.ADDRESS));
+                new Country(
+                        SharedPrefs.getInstance(requireContext()).getLong(Constants.COUNTRY_ID),
+                        SharedPrefs.getInstance(requireContext()).getString(Constants.COUNTRY_TITLE),
+                        SharedPrefs.getInstance(requireContext()).getString(Constants.COUNTRY_CODE),
+                        null),
+                SharedPrefs.getInstance(requireContext()).getString(Constants.CITY),
+                SharedPrefs.getInstance(requireContext()).getString(Constants.POSITION),
+                SharedPrefs.getInstance(requireContext()).getString(Constants.ADDRESS),
+                SharedPrefs.getInstance(requireContext()).getString(Constants.PHOTO_URL));
+
+        networkConnectivity = new NetworkConnectivity(requireContext(), AppExecutors.getInstance());
+
+        final UserViewModelFactory factory = new UserViewModelFactory(requireContext());
+        userViewModel = new ViewModelProvider(getViewModelStore(), factory).get(UserViewModel.class);
+
     }
 
     @Override
@@ -81,19 +108,21 @@ public class PersonalDataFragment extends Fragment {
         cityEditText = root.findViewById(R.id.city_edit_text);
         addressEditText = root.findViewById(R.id.address_edit_text);
         saveBtn = root.findViewById(R.id.save_btn);
+        progressBar = root.findViewById(R.id.progress_bar);
 
         bubbleAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.bubble);
 
         nestedScrollView = root.findViewById(R.id.scroll_layout);
 
-        firstNameEditText.setText(currentUser.getFirstName());
-        lastNameEditText.setText(currentUser.getLastName());
-        middleNameEditText.setText(currentUser.getMiddleName());
-        positionEditText.setText(currentUser.getPosition());
-        phoneEditText.setText(currentUser.getPhone());
-        emailEditText.setText(currentUser.getEmail());
-        cityEditText.setText(currentUser.getCity());
-        addressEditText.setText(currentUser.getAddress());
+        firstNameEditText.setText(currentUser == null || TextUtils.isEmpty(currentUser.getFirstName()) ? getString(R.string.not_assigned) : currentUser.getFirstName());
+        lastNameEditText.setText(currentUser == null || TextUtils.isEmpty(currentUser.getLastName()) ? getString(R.string.not_assigned) : currentUser.getLastName());
+        middleNameEditText.setText(currentUser == null || TextUtils.isEmpty(currentUser.getMiddleName()) ? getString(R.string.not_assigned) : currentUser.getMiddleName());
+        positionEditText.setText(currentUser == null || TextUtils.isEmpty(currentUser.getPosition()) ? getString(R.string.not_assigned) : currentUser.getPosition());
+        phoneEditText.setText(currentUser == null || TextUtils.isEmpty(currentUser.getPhone()) ? getString(R.string.not_assigned) : currentUser.getPhone());
+        emailEditText.setText(currentUser == null || TextUtils.isEmpty(currentUser.getEmail()) ? getString(R.string.not_assigned) : currentUser.getEmail());
+        countryEditText.setText(currentUser == null || currentUser.getCountry() == null ? getString(R.string.not_assigned): currentUser.getCountry().getTitle());
+        cityEditText.setText(currentUser == null || TextUtils.isEmpty(currentUser.getCity()) ? getString(R.string.not_assigned) : currentUser.getCity());
+        addressEditText.setText(currentUser == null || TextUtils.isEmpty(currentUser.getAddress()) ? getString(R.string.not_assigned) : currentUser.getAddress());
 
         return root;
     }
@@ -103,15 +132,16 @@ public class PersonalDataFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         backArrowImageView.setOnClickListener(v -> {
-            if (getActivity() != null) {
-                if (getActivity().getCurrentFocus() == null) {
-                    getActivity().getSupportFragmentManager().popBackStack();
-                    return;
-                }
-                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
-                getActivity().getCurrentFocus().clearFocus();
-            }
+//            if (getActivity() != null) {
+//                if (getActivity().getCurrentFocus() == null) {
+//                    NavHostFragment.findNavController(this).popBackStack();
+//                    return;
+//                }
+//                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(INPUT_METHOD_SERVICE);
+//                imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+//                getActivity().getCurrentFocus().clearFocus();
+//            }
+            NavHostFragment.findNavController(this).popBackStack();
         });
 
         firstNameEditText.setOnFocusChangeListener((v, hasFocus) -> {
@@ -150,13 +180,31 @@ public class PersonalDataFragment extends Fragment {
             UiUtils.setFocusChange(addressEditText, hasFocus, R.string.address);
         });
 
+        countryEditText.setEnabled(false);
+        positionEditText.setEnabled(false);
+        phoneEditText.setEnabled(false);
+
         saveBtn.setOnClickListener(v -> {
             saveBtn.startAnimation(bubbleAnimation);
-            saveBtn.postOnAnimationDelayed(() -> {
-                if (getActivity() != null) {
-                    getActivity().getSupportFragmentManager().popBackStack();
+
+            final String firstName = firstNameEditText.getText().toString().trim();
+            final String lastName = lastNameEditText.getText().toString().trim();
+            final String middleName = middleNameEditText.getText().toString().trim();
+            final String email = emailEditText.getText().toString().trim();
+            final String city = cityEditText.getText().toString().trim();
+            final String address = addressEditText.getText().toString().trim();
+
+            networkConnectivity.checkInternetConnection(isConnected -> {
+                if (!isConnected) {
+                    NavHostFragment.findNavController(this).navigate(
+                            PersonalDataFragmentDirections.actionPersonalDataFragmentToTransactionResultFragment()
+                                    .setResult(false)
+                                    .setType(Constants.RESULT_TYPE_PROFILE)
+                                    .setErrorMessage(Constants.NO_INTERNET));
+                    return;
                 }
-            }, 100);
+                userViewModel.saveUserData(firstName, lastName, middleName, email, city, address);
+            });
         });
     }
 
@@ -164,15 +212,46 @@ public class PersonalDataFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        final AuthViewModelFactory factory = new AuthViewModelFactory(requireContext());
+        userViewModel.getSaveUserDataResult(requireContext()).observe(getViewLifecycleOwner(), workInfo -> {
+            if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                final User userData = new User(
+                        workInfo.getOutputData().getLong(Constants.USER_ID, 0L),
+                        workInfo.getOutputData().getLong(Constants.CLUB_NUMBER, 0L),
+                        workInfo.getOutputData().getString(Constants.FIRST_NAME),
+                        workInfo.getOutputData().getString(Constants.LAST_NAME),
+                        workInfo.getOutputData().getString(Constants.MIDDLE_NAME),
+                        workInfo.getOutputData().getString(Constants.PHONE),
+                        workInfo.getOutputData().getString(Constants.EMAIL),
+                        new Country(
+                                workInfo.getOutputData().getLong(Constants.COUNTRY_ID, 0L),
+                                workInfo.getOutputData().getString(Constants.COUNTRY_TITLE),
+                                workInfo.getOutputData().getString(Constants.COUNTRY_CODE),
+                                null),
+                        workInfo.getOutputData().getString(Constants.CITY),
+                        workInfo.getOutputData().getString(Constants.POSITION),
+                        workInfo.getOutputData().getString(Constants.ADDRESS),
+                        workInfo.getOutputData().getString(Constants.PHOTO_URL));
+                SharedPrefs.getInstance(requireContext()).saveUserData(userData);
+                progressBar.setVisibility(View.GONE);
+                saveBtn.setVisibility(View.VISIBLE);
 
-        final AuthViewModel viewModel = new ViewModelProvider(getViewModelStore(), factory).get(AuthViewModel.class);
+                Toast.makeText(requireContext(), R.string.success_data_safe, Toast.LENGTH_SHORT).show();
+                NavHostFragment.findNavController(this).popBackStack();
 
-        viewModel.getCountry(currentUser.getCountryId()).observe(getViewLifecycleOwner(), country -> {
-            if (country != null) {
-                countryEditText.setText(country.getTitle());
+                return;
             }
+            if (workInfo.getState() == WorkInfo.State.FAILED || workInfo.getState() == WorkInfo.State.CANCELLED) {
+                progressBar.setVisibility(View.GONE);
+                saveBtn.setVisibility(View.VISIBLE);
+
+                Toast.makeText(requireContext(), workInfo.getOutputData().getString(Constants.REQUEST_ERROR), Toast.LENGTH_SHORT).show();
+
+                return;
+            }
+            progressBar.setVisibility(View.VISIBLE);
+            saveBtn.setVisibility(View.GONE);
         });
+
     }
 
     private static final String TAG = PersonalDataFragment.class.toString();
