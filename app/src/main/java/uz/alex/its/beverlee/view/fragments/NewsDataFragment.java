@@ -76,6 +76,7 @@ public class NewsDataFragment extends Fragment {
                 .load(currentNews.getPhotoUrl())
                 .centerCrop()
                 .fit()
+                .error(R.color.colorDarkGrey)
                 .into(bannerImageView);;
 
         return root;
