@@ -11,6 +11,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.shape.CornerFamily;
+import com.google.android.material.shape.ShapeAppearanceModel;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -78,6 +81,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
                 .load(newsList.get(position).getPhotoUrl())
                 .centerCrop()
                 .fit()
+                .error(R.color.colorDarkGrey)
                 .into(holder.coverImageView);
 
         holder.bindItem(callback, position, newsList.get(position));
@@ -121,6 +125,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
 
         public NewsBannerViewHolder(@NonNull View itemView) {
             super(itemView);
+
             dateTextView = itemView.findViewById(R.id.news_date_text_view);
             descriptionTextView = itemView.findViewById(R.id.news_description_text_view);
             moreTextView = itemView.findViewById(R.id.more_text_view);
