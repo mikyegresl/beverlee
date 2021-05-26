@@ -49,6 +49,14 @@ public class NotificationSettingsFragment extends Fragment {
     private CheckBox notifyPurchaseCheckBox;
     private CheckBox notifyReplenishCheckBox;
     private CheckBox notifyWithdrawalCheckBox;
+
+    private TextView notifyNewsTextView;
+    private TextView notifyBonusesTextView;
+    private TextView notifyIncomeTextView;
+    private TextView notifyPurchaseTextView;
+    private TextView notifyReplenishTextView;
+    private TextView notifyWithdrawalTextView;
+
     private TextView errorTextView;
     private ProgressBar progressBar;
     private Button saveBtn;
@@ -96,7 +104,25 @@ public class NotificationSettingsFragment extends Fragment {
         notifyReplenishCheckBox = root.findViewById(R.id.notify_replenish_check_box);
         notifyWithdrawalCheckBox = root.findViewById(R.id.notify_withdrawal_check_box);
 
-        bubbleAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.bubble);
+        notifyNewsTextView = root.findViewById(R.id.notify_news_text_view);
+        notifyNewsTextView.setOnClickListener(v -> notifyNewsCheckBox.performClick());
+
+        notifyBonusesTextView = root.findViewById(R.id.notify_bonuses_text_view);
+        notifyBonusesTextView.setOnClickListener(v -> notifyBonusesCheckBox.performClick());
+
+        notifyIncomeTextView = root.findViewById(R.id.notify_income_text_view);
+        notifyIncomeTextView.setOnClickListener(v -> notifyIncomeCheckBox.performClick());
+
+        notifyPurchaseTextView = root.findViewById(R.id.notify_purchase_text_view);
+        notifyPurchaseTextView.setOnClickListener(v -> notifyPurchaseCheckBox.performClick());
+
+        notifyReplenishTextView = root.findViewById(R.id.notify_replenish_text_view);
+        notifyReplenishTextView.setOnClickListener(v -> notifyReplenishCheckBox.performClick());
+
+        notifyWithdrawalTextView = root.findViewById(R.id.notify_withdrawal_text_view);
+        notifyWithdrawalTextView.setOnClickListener(v -> notifyWithdrawalCheckBox.performClick());
+
+                bubbleAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.bubble);
 
         return root;
     }
