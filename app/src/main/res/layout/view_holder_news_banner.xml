@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="320dp"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginTop="40dp"
-    android:layout_marginBottom="80dp"
-    android:layout_marginHorizontal="8dp"
+    android:layout_margin="@dimen/fab_margin"
     android:background="#fff">
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -20,7 +18,8 @@
         android:foreground="#80000000"
         android:scaleType="centerCrop"
         app:shapeAppearanceOverlay="@style/roundedCorners"
-        android:contentDescription="@string/news"/>
+        android:contentDescription="@string/news"
+        style="@style/roundedCorners" />
 
     <View
         android:id="@+id/news_body"

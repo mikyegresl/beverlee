@@ -56,7 +56,7 @@ public class NewsFragment extends Fragment implements NewsCallback {
         newsRecyclerView = root.findViewById(R.id.news_recycler_view);
 
         layoutManager = new LinearLayoutManager(requireContext());
-        layoutManager.setOrientation(RecyclerView.HORIZONTAL);
+        layoutManager.setOrientation(RecyclerView.VERTICAL);
 
         newsAdapter = new NewsAdapter(requireContext(), this, NewsAdapter.TYPE_BANNER);
         newsRecyclerView.setLayoutManager(layoutManager);
@@ -124,7 +124,8 @@ public class NewsFragment extends Fragment implements NewsCallback {
 
     @Override
     public void onNewsSelected(final int position, final News news) {
-        final NewsFragmentDirections.ActionNewsFragmentToNewsDataFragment action = NewsFragmentDirections.actionNewsFragmentToNewsDataFragment();
+        final NewsFragmentDirections.ActionNewsFragmentToNewsDataFragment action
+                = NewsFragmentDirections.actionNewsFragmentToNewsDataFragment();
         action.setNewsId(news.getId());
         action.setTitle(news.getTitle());
         action.setDescription(news.getDescription());

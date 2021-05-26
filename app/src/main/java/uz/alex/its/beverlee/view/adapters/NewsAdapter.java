@@ -62,16 +62,16 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
     @Override
     public void onBindViewHolder(@NonNull NewsViewHolder holder, int position) {
         /* news banner type view holder */
-        if (position == 0) {
-            final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
-            params.leftMargin = 80;
-            holder.itemView.setLayoutParams(params);
-        }
-        else if (position == newsList.size() - 1) {
-            final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
-            params.rightMargin = 80;
-            holder.itemView.setLayoutParams(params);
-        }
+//        if (position == 0) {
+//            final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
+//            params.leftMargin = 80;
+//            holder.itemView.setLayoutParams(params);
+//        }
+//        else if (position == newsList.size() - 1) {
+//            final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
+//            params.rightMargin = 80;
+//            holder.itemView.setLayoutParams(params);
+//        }
         holder.titleTextView.setText(Html.fromHtml(newsList.get(position).getTitle(), Html.FROM_HTML_MODE_COMPACT));
 
         Picasso.get()
