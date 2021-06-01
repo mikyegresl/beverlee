@@ -125,4 +125,6 @@ dependencies {
 
     /* Pie chart */
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
+    implementation 'com.andrognito.pinlockview:pinlockview:2.1.0'
 }

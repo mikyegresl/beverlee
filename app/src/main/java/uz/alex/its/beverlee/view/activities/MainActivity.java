@@ -2,7 +2,6 @@ package uz.alex.its.beverlee.view.activities;
 
 import android.Manifest;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -16,7 +15,8 @@ import uz.alex.its.beverlee.R;
 import uz.alex.its.beverlee.utils.Constants;
 import uz.alex.its.beverlee.utils.PermissionManager;
 
-public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemReselectedListener {
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener,
+        BottomNavigationView.OnNavigationItemReselectedListener {
     private BottomNavigationView bottomNavigationView;
     private static int currentNavItem = R.id.navigation_home;
 
