@@ -1,92 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/news_min_card_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:cardCornerRadius="27dp"
-    android:layout_margin="@dimen/news_margin">
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/s_margin"
+    android:elevation="4dp"
+    app:cardCornerRadius="16dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:cardBackgroundColor="#80000000">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#fff">
-
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/news_header"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:contentDescription="@string/news"
-            android:scaleType="centerCrop"
-            android:src="#80000000"
-            app:layout_constraintDimensionRatio="H,25:11"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <View
-            android:id="@+id/news_body"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="#f8f8f8"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/news_header" />
+        android:layout_height="wrap_content"
+        android:padding="@dimen/m_margin">
 
         <TextView
             android:id="@+id/news_title_text_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="35dp"
+            android:layout_margin="@dimen/fab_margin"
+            android:layout_marginHorizontal="12dp"
+            android:elevation="8dp"
             android:fontFamily="@font/geometria_medium"
-            android:gravity="start"
-            android:text="@string/news_title_example"
+            android:text="@string/advert_content"
             android:textColor="#FFF"
-            android:textSize="19sp"
-            app:layout_constraintEnd_toEndOf="@id/news_header"
-            app:layout_constraintStart_toStartOf="@id/news_header"
-            app:layout_constraintTop_toTopOf="@id/news_header" />
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/news_date_text_view"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginBottom="18dp"
             android:fontFamily="@font/geometria_actual"
             android:text="@string/news_date_example"
             android:textColor="#FFF"
             android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@id/news_header"
-            app:layout_constraintStart_toStartOf="@id/news_title_text_view" />
-
-        <TextView
-            android:id="@+id/news_description_text_view"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginVertical="16dp"
-            android:fontFamily="@font/geometria_medium"
-            android:gravity="start|center_horizontal"
-            android:text="@string/news_content_example"
-            android:textColor="#3B3A39"
-            android:textSize="15sp"
-            app:layout_constraintBottom_toTopOf="@id/more_text_view"
-            app:layout_constraintEnd_toEndOf="@id/news_title_text_view"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/news_title_text_view"
-            app:layout_constraintTop_toTopOf="@id/news_body" />
+            app:layout_constraintTop_toBottomOf="@id/news_title_text_view" />
 
         <TextView
             android:id="@+id/more_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
+            android:layout_margin="@dimen/xl_margin"
             android:fontFamily="@font/geometria_actual"
             android:gravity="bottom"
             android:text="@string/news_more"
-            android:textColor="#3B3A39"
+            android:textColor="@color/black"
             android:textSize="15sp"
-            app:layout_constraintBottom_toBottomOf="@id/news_body"
-            app:layout_constraintStart_toStartOf="@id/news_description_text_view" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/news_date_text_view" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
+
+
