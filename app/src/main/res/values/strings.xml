@@ -26,6 +26,7 @@
     <string name="first_name">Имя</string>
     <string name="last_name">Фамилия</string>
     <string name="full_name">Полное имя</string>
+    <string name="fio">Ф.И.О</string>
     <string name="phone_number_unified">Номер телефона в международном формате</string>
     <string name="phone_number">Номер телефона</string>
     <string name="email">Эл. почта</string>
@@ -144,6 +145,7 @@
     <string name="identifier">Идентификатор: %s</string>
     <string name="club_number">Клубный номер: %s</string>
 
+    <string name="logout"> Выйти из профиля </string>
     <string name="pick_image">Выберите фото</string>
     <!-- personal data -->
     <string name="personal_data">Персональные данные</string>
