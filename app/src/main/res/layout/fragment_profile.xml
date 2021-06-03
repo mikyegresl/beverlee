@@ -102,7 +102,6 @@
                 app:layout_constraintEnd_toEndOf="@id/card_layout"
                 android:layout_marginTop="18dp"
                 android:gravity="center"
-                android:text="@string/profile_name"
                 android:fontFamily="@font/geometria_bold"
                 android:textColor="@color/colorBlack"
                 android:textSize="19sp"/>
@@ -116,7 +115,6 @@
                 app:layout_constraintEnd_toEndOf="@id/card_layout"
                 android:layout_marginTop="15dp"
                 android:gravity="center"
-                android:text="@string/identifier"
                 android:fontFamily="@font/geometria_actual"
                 android:textColor="@color/colorBlack"
                 android:textSize="17sp"/>
@@ -130,7 +128,6 @@
                 app:layout_constraintEnd_toEndOf="@id/card_layout"
                 android:layout_marginTop="12dp"
                 android:gravity="center"
-                android:text="@string/club_number"
                 android:fontFamily="@font/geometria_actual"
                 android:textColor="@color/colorBlack"
                 android:textSize="17sp"/>
@@ -141,12 +138,32 @@
                 android:layout_height="65dp"
                 app:layout_constraintStart_toStartOf="@id/card_layout"
                 app:layout_constraintEnd_toEndOf="@id/card_layout"
+                app:layout_constraintTop_toBottomOf="@id/club_number_text_view"
                 app:layout_constraintBottom_toBottomOf="@id/card_layout"
                 android:background="@drawable/btn_purple"
                 android:text="@string/edit"
                 android:textAllCaps="false"
                 android:fontFamily="@font/geometria_medium"
                 android:textColor="#fff"
+                android:textSize="17sp"
+                android:layout_marginStart="50dp"
+                android:layout_marginEnd="50dp"
+                android:layout_marginBottom="50dp"
+                android:elevation="2dp"/>
+
+            <Button
+                android:id="@+id/logout_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@id/card_layout"
+                app:layout_constraintEnd_toEndOf="@id/card_layout"
+                app:layout_constraintTop_toBottomOf="@id/edit_btn"
+                app:layout_constraintBottom_toBottomOf="@id/card_layout"
+                android:background="@android:color/transparent"
+                android:text="@string/logout"
+                android:textAllCaps="false"
+                android:fontFamily="@font/geometria_medium"
+                android:textColor="@color/black"
                 android:textSize="17sp"
                 android:layout_marginStart="50dp"
                 android:layout_marginEnd="50dp"
@@ -163,6 +180,7 @@
                 app:layout_constraintBottom_toBottomOf="@id/card_layout"
                 android:indeterminateTint="@color/colorPurple"
                 android:visibility="gone"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
