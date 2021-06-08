@@ -39,6 +39,7 @@
     <string name="repeat_pin">Повторите PIN-код</string>
     <string name="forgot_pin">Забыли PIN-код?</string>
     <string name="or_enter_pin">Или введите PIN-код</string>
+    <string name="change_pin"> Сменить PIN-код </string>
     <string name="one">1</string>
     <string name="two">2</string>
     <string name="three">3</string>

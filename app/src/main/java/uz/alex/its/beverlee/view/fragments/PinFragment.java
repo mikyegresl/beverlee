@@ -168,6 +168,7 @@ public class PinFragment extends Fragment {
             if (workInfo.getState() == WorkInfo.State.FAILED || workInfo.getState() == WorkInfo.State.CANCELLED) {
                 pinErrorTextView.setText(R.string.error_wrong_pin);
                 pinErrorTextView.setVisibility(View.VISIBLE);
+                pinLockView.resetPinLockView();
                 return;
             }
             pinErrorTextView.setVisibility(View.INVISIBLE);

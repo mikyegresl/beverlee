@@ -43,7 +43,7 @@
         android:fontFamily="@font/geometria_medium"
         android:textColor="#fff"
         android:textSize="17sp"
-        android:layout_marginBottom="28dp" />
+        android:layout_marginBottom="@dimen/xl_margin" />
 
     <Button
         android:id="@+id/sign_up_button"
@@ -58,8 +58,8 @@
         android:fontFamily="@font/geometria_medium"
         android:textColor="#fff"
         android:textSize="17sp"
-        android:layout_marginStart="52dp"
-        android:layout_marginEnd="52dp"
-        android:layout_marginBottom="52dp"/>
+        android:layout_marginStart="@dimen/xxl_margin"
+        android:layout_marginEnd="@dimen/xxl_margin"
+        android:layout_marginBottom="@dimen/xxl_margin"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
