@@ -3,6 +3,7 @@ package uz.alex.its.beverlee.view.dialog;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -52,6 +53,7 @@ public class VerifyTransactionDialog extends DialogFragment {
         rect.setBounds(0, 0, metrics.widthPixels, metrics.heightPixels);
         final float width = rect.width * (float) percentage / 100;
         getDialog().getWindow().setLayout((int) width, ViewGroup.LayoutParams.WRAP_CONTENT);
+        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
     }
 
     @Override
