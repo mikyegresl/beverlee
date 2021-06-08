@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -33,6 +34,7 @@ import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -308,6 +310,14 @@ public class MonitoringFragment extends Fragment {
                 return;
             }
             currentMonthTextView.setText(getString(R.string.month_name, getString(transactionViewModel.getMonthName(monthNumber + 1))));
+
+            LocalDate currentdate = LocalDate.now();
+            int currentMonth = currentdate.getMonth().getValue();
+            if (monthNumber == currentMonth-1) {
+               nextChartImageView.setVisibility(View.INVISIBLE);
+            } else {
+                nextChartImageView.setVisibility(View.VISIBLE);
+            }
         });
 
         transactionViewModel.getMonthlyBalance().observe(getViewLifecycleOwner(), monthlyBalance -> {
