@@ -133,14 +133,14 @@ public class PurchaseModel {
         @Expose
         @SerializedName("order_id")
         @ColumnInfo(name = "order_id")
-        private final long orderId;
+        private final String orderId;
 
         @Expose
         @SerializedName("title")
         @ColumnInfo(name = "title")
         private final String title;
 
-        public Product(final long id, final long orderId, final String title) {
+        public Product(final long id, final String orderId, final String title) {
             this.id = id;
             this.orderId = orderId;
             this.title = title;
@@ -150,7 +150,7 @@ public class PurchaseModel {
             return id;
         }
 
-        public long getOrderId() {
+        public String getOrderId() {
             return orderId;
         }
 

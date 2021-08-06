@@ -297,6 +297,7 @@ public class TransactionViewModel extends ViewModel {
                     monthlyTransferAmount.setValue(transferAmount);
                     monthlyReplenishAmount.setValue(replenishAmount);
                     monthlyWithdrawalAmount.setValue(withdrawalAmount);
+
                     /* monthly balance */
                     final double balanceIncrease = bonusAmount + receiptAmount + replenishAmount;
                     final double balanceDecrease = purchaseAmount + transferAmount + withdrawalAmount;
@@ -314,6 +315,7 @@ public class TransactionViewModel extends ViewModel {
             @Override
             public void onFailure(@NonNull Call<TransactionModel> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure(): ", t);
+                Log.i(TAG, "onFailure(): trigger");
                 isLoading.setValue(false);
             }
         });
