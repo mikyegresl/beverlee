@@ -183,6 +183,8 @@ public class PersonalDataFragment extends Fragment {
         saveBtn.setOnClickListener(v -> {
             saveBtn.startAnimation(bubbleAnimation);
 
+            final String notAssigned = getString(R.string.not_assigned);
+
             final String firstName = firstNameEditText.getText().toString().trim();
             final String lastName = lastNameEditText.getText().toString().trim();
             final String middleName = middleNameEditText.getText().toString().trim();
@@ -200,7 +202,12 @@ public class PersonalDataFragment extends Fragment {
                             new NavOptions.Builder().setPopUpTo(R.id.transferFragment, false).build());
                     return;
                 }
-                userViewModel.saveUserData(firstName, lastName, middleName, email, city, address);
+                userViewModel.saveUserData(firstName.equals(notAssigned) ? "" : firstName,
+                        lastName.equals(notAssigned) ? "" : lastName,
+                        middleName.equals(notAssigned) ? "" : middleName,
+                        email.equals(notAssigned) ? "" : email,
+                        city.equals(notAssigned) ? "" : city,
+                        address.equals(notAssigned) ? "" : address);
             });
         });
     }

@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -38,9 +39,9 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 public class ReplenishFragment extends Fragment {
     private ImageView backArrowImageView;
     private EditText amountEditText;
-//    private TextView amountWithCommissionTextView;
     private ProgressBar progressBar;
     private CircularProgressButton replenishBtn;
+    private WebView webView;
 
     private NetworkConnectivity networkConnectivity;
     private TransactionViewModel transactionViewModel;
@@ -73,9 +74,9 @@ public class ReplenishFragment extends Fragment {
 
         backArrowImageView = root.findViewById(R.id.back_arrow_image_view);
         amountEditText = root.findViewById(R.id.amount_edit_text);
-//        amountWithCommissionTextView = root.findViewById(R.id.amount_with_commission_text_view);
         replenishBtn = root.findViewById(R.id.replenish_btn);
         progressBar = root.findViewById(R.id.progress_bar);
+        webView = root.findViewById(R.id.web_view);
 
         return root;
     }
@@ -85,8 +86,6 @@ public class ReplenishFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         UiUtils.hideBottomNav(requireActivity());
-
-//        amountWithCommissionTextView.setText(getString(R.string.amount_with_commission, 0.00));
 
         backArrowImageView.setOnClickListener(v -> {
             NavHostFragment.findNavController(this).popBackStack();
@@ -124,7 +123,10 @@ public class ReplenishFragment extends Fragment {
 
         transactionViewModel.getReplenishResult(requireContext()).observe(getViewLifecycleOwner(), workInfo -> {
             if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(workInfo.getOutputData().getString(Constants.REPLENISH_URL))));
+                //open web url in webView
+//                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse()));
+                webView.loadUrl(workInfo.getOutputData().getString(Constants.REPLENISH_URL));
+
                 progressBar.setVisibility(View.GONE);
                 amountEditText.setEnabled(true);
                 return;

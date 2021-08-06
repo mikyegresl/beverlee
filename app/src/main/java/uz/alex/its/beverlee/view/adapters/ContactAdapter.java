@@ -1,6 +1,7 @@
 package uz.alex.its.beverlee.view.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,6 +60,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
     @Override
     public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
+        Log.i(TAG, "contact=" + contactList.get(position));
         holder.contactNameTextView.setText(contactList.get(position).getFio());
         holder.bind(contactList.get(position), contactCallback);
         /* spinner view holder */

@@ -260,6 +260,8 @@ public class ProfileFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         userViewModel.getUserData().observe(getViewLifecycleOwner(), user -> {
+            Log.i(TAG, "userData=" + user);
+
             fullNameTextView.setText(user == null ? getString(R.string.not_assigned) : getString(R.string.profile_name, user.getFirstName(), user.getLastName()));
             idTextView.setText(user == null || user.getId() <= 0 ? getString(R.string.identifier, getString(R.string.not_assigned)) : getString(R.string.identifier, String.valueOf(user.getId())
             ));
