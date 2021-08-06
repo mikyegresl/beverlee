@@ -13,11 +13,14 @@ import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.work.WorkInfo;
 
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -31,6 +34,7 @@ import uz.alex.its.beverlee.utils.AppExecutors;
 import uz.alex.its.beverlee.utils.Constants;
 import uz.alex.its.beverlee.utils.NetworkConnectivity;
 import uz.alex.its.beverlee.view.UiUtils;
+import uz.alex.its.beverlee.view.dialog.WebDialogFragment;
 import uz.alex.its.beverlee.viewmodel.TransactionViewModel;
 import uz.alex.its.beverlee.viewmodel.factory.TransactionViewModelFactory;
 
@@ -39,9 +43,9 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 public class ReplenishFragment extends Fragment {
     private ImageView backArrowImageView;
     private EditText amountEditText;
+    private TextView commissionTextView;
     private ProgressBar progressBar;
     private CircularProgressButton replenishBtn;
-    private WebView webView;
 
     private NetworkConnectivity networkConnectivity;
     private TransactionViewModel transactionViewModel;
@@ -74,9 +78,9 @@ public class ReplenishFragment extends Fragment {
 
         backArrowImageView = root.findViewById(R.id.back_arrow_image_view);
         amountEditText = root.findViewById(R.id.amount_edit_text);
+        commissionTextView = root.findViewById(R.id.amount_with_commission_text_view);
         replenishBtn = root.findViewById(R.id.replenish_btn);
         progressBar = root.findViewById(R.id.progress_bar);
-        webView = root.findViewById(R.id.web_view);
 
         return root;
     }
@@ -87,12 +91,44 @@ public class ReplenishFragment extends Fragment {
 
         UiUtils.hideBottomNav(requireActivity());
 
+        commissionTextView.setText(getString(R.string.amount_with_commission, 0.0));
+
         backArrowImageView.setOnClickListener(v -> {
             NavHostFragment.findNavController(this).popBackStack();
         });
 
         amountEditText.setOnFocusChangeListener((v, hasFocus) -> {
             UiUtils.setFocusChange(amountEditText, hasFocus, R.string.zero);
+        });
+
+        amountEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() <= 0) {
+                    commissionTextView.setText(getString(R.string.amount_with_commission, 0.00));
+                    return;
+                }
+                if (TextUtils.isEmpty(s)) {
+                    return;
+                }
+                if (!TextUtils.isDigitsOnly(s)) {
+                    return;
+                }
+                final double numericAmount = Double.parseDouble(s.toString());
+                final double amountWithCommission = numericAmount + (double) numericAmount*3/100;
+
+                commissionTextView.setText(getString(R.string.amount_with_commission, amountWithCommission));
+            }
         });
 
         replenishBtn.setOnClickListener(v -> {
@@ -124,8 +160,9 @@ public class ReplenishFragment extends Fragment {
         transactionViewModel.getReplenishResult(requireContext()).observe(getViewLifecycleOwner(), workInfo -> {
             if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
                 //open web url in webView
-//                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse()));
-                webView.loadUrl(workInfo.getOutputData().getString(Constants.REPLENISH_URL));
+
+                final WebDialogFragment webDialog = WebDialogFragment.newInstance(workInfo.getOutputData().getString(Constants.REPLENISH_URL));
+                webDialog.show(getParentFragmentManager().beginTransaction(), TAG);
 
                 progressBar.setVisibility(View.GONE);
                 amountEditText.setEnabled(true);
@@ -141,4 +178,6 @@ public class ReplenishFragment extends Fragment {
             amountEditText.setEnabled(false);
         });
     }
+
+    private static final String TAG = ReplenishFragment.class.toString();
 }
