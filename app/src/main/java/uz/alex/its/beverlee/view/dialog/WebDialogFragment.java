@@ -87,7 +87,7 @@ public class WebDialogFragment extends DialogFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setDimensions(90, requireContext());
+        setDimensions(80, requireContext());
     }
 
     private static final String TAG = WebDialogFragment.class.toString();

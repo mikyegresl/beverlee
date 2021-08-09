@@ -131,26 +131,24 @@ public class ReplenishFragment extends Fragment {
             }
         });
 
-        replenishBtn.setOnClickListener(v -> {
-            networkConnectivity.checkInternetConnection(isConnected -> {
-                if (!isConnected) {
-                    NavHostFragment.findNavController(this).navigate(
-                            ReplenishFragmentDirections.actionDebitFragmentToTransactionResultFragment()
-                                    .setResult(false)
-                                    .setType(Constants.RESULT_TYPE_TRANSFER)
-                                    .setErrorMessage(Constants.NO_INTERNET),
-                            new NavOptions.Builder().setPopUpTo(R.id.transferFragment, false).build());
-                    return;
-                }
-                final String amount = amountEditText.getText().toString().trim();
+        replenishBtn.setOnClickListener(v -> networkConnectivity.checkInternetConnection(isConnected -> {
+            if (!isConnected) {
+                NavHostFragment.findNavController(this).navigate(
+                        ReplenishFragmentDirections.actionDebitFragmentToTransactionResultFragment()
+                                .setResult(false)
+                                .setType(Constants.RESULT_TYPE_TRANSFER)
+                                .setErrorMessage(Constants.NO_INTERNET),
+                        new NavOptions.Builder().setPopUpTo(R.id.transferFragment, false).build());
+                return;
+            }
+            final String amount = amountEditText.getText().toString().trim();
 
-                if (TextUtils.isEmpty(amount) || !TextUtils.isDigitsOnly(amount)) {
-                    Toast.makeText(requireContext(), "Ошибка ввода", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                transactionViewModel.replenish(amount);
-            });
-        });
+            if (TextUtils.isEmpty(amount) || !TextUtils.isDigitsOnly(amount)) {
+                Toast.makeText(requireContext(), "Ошибка ввода", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            transactionViewModel.replenish(amount);
+        }));
     }
 
     @Override

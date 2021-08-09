@@ -6,28 +6,28 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class TransferErrorModel {
+public class TransactionErrorModel {
     @Expose
     @SerializedName("errors")
-    private final TransferError transferError;
+    private final TransactionError transactionError;
 
-    public TransferErrorModel(final TransferError transferError) {
-        this.transferError = transferError;
+    public TransactionErrorModel(final TransactionError transactionError) {
+        this.transactionError = transactionError;
     }
 
-    public TransferError getTransferError() {
-        return transferError;
+    public TransactionError getTransactionError() {
+        return transactionError;
     }
 
     @NonNull
     @Override
     public String toString() {
         return "TransferErrorModel{" +
-                "transferError=" + transferError +
+                "transferError=" + transactionError +
                 '}';
     }
 
-    public static class TransferError {
+    public static class TransactionError {
         @Expose
         @SerializedName("amount")
         private final List<String> amount;
@@ -36,7 +36,7 @@ public class TransferErrorModel {
         @SerializedName("pin")
         private final List<String> pin;
 
-        public TransferError(final List<String> amount, final List<String> pin) {
+        public TransactionError(final List<String> amount, final List<String> pin) {
             this.amount = amount;
             this.pin = pin;
         }
@@ -52,7 +52,7 @@ public class TransferErrorModel {
         @NonNull
         @Override
         public String toString() {
-            return "LoginError{" +
+            return "TransactionError{" +
                     "amount='" + amount + '\'' +
                     ", pin='" + pin + '\'' +
                     '}';

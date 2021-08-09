@@ -8,12 +8,17 @@ import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
 import java.io.IOException;
+import java.lang.reflect.Type;
 
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 import uz.alex.its.beverlee.api.RetrofitClient;
 import uz.alex.its.beverlee.model.requestParams.ReplenishParams;
+import uz.alex.its.beverlee.model.response.error.TransactionErrorModel;
 import uz.alex.its.beverlee.model.transaction.ReplenishModel;
 import uz.alex.its.beverlee.utils.Constants;
 
@@ -53,7 +58,26 @@ public class ReplenishWorker extends Worker {
             if (error == null) {
                 return Result.failure(outputDataBuilder.putString(Constants.REQUEST_ERROR, Constants.UNKNOWN_ERROR).build());
             }
-            return Result.failure(outputDataBuilder.putString(Constants.REQUEST_ERROR, error.string()).build());
+            if (response.code() == 422) {
+                final Type transferErrorType = new TypeToken<TransactionErrorModel>() {}.getType();
+                final TransactionErrorModel transactionError = new GsonBuilder().setLenient().create().fromJson(error.string(), transferErrorType);
+
+                String parsedError = null;
+
+                if (transactionError.getTransactionError().getAmount() != null) {
+                    parsedError = transactionError.getTransactionError().getAmount().get(0);
+                }
+                if (transactionError.getTransactionError().getPin() != null) {
+                    parsedError = transactionError.getTransactionError().getPin().get(0);
+                }
+                if (parsedError == null) {
+                    return Result.failure(outputDataBuilder.putString(Constants.REQUEST_ERROR, Constants.UNKNOWN_ERROR).build());
+                }
+                return Result.failure(outputDataBuilder
+                        .putString(Constants.REQUEST_ERROR, parsedError)
+                        .build());
+            }
+            return Result.failure(outputDataBuilder.putString(Constants.REQUEST_ERROR, Constants.UNKNOWN_ERROR).build());
         }
         catch (IOException e) {
             Log.e(TAG, "doWork(): ", e);

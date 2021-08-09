@@ -1,7 +1,6 @@
 package uz.alex.its.beverlee.worker.transaction;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -19,7 +18,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Response;
 import uz.alex.its.beverlee.api.RetrofitClient;
 import uz.alex.its.beverlee.model.requestParams.VerifyTransferParams;
-import uz.alex.its.beverlee.model.response.error.TransferErrorModel;
+import uz.alex.its.beverlee.model.response.error.TransactionErrorModel;
 import uz.alex.its.beverlee.utils.Constants;
 
 public class VerifyTransferWorker extends Worker {
@@ -62,14 +61,14 @@ public class VerifyTransferWorker extends Worker {
                 return Result.failure(outputDataBuilder.putString(Constants.REQUEST_ERROR, Constants.UNKNOWN_ERROR).build());
             }
             if (response.code() == 422) {
-                final Type transferErrorType = new TypeToken<TransferErrorModel>() {}.getType();
-                final TransferErrorModel transferError = new GsonBuilder().setLenient().create().fromJson(error.string(), transferErrorType);
+                final Type transferErrorType = new TypeToken<TransactionErrorModel>() {}.getType();
+                final TransactionErrorModel transferError = new GsonBuilder().setLenient().create().fromJson(error.string(), transferErrorType);
 
-                if (transferError.getTransferError().getAmount() == null) {
+                if (transferError.getTransactionError().getAmount() == null) {
                     return Result.failure(outputDataBuilder.putString(Constants.REQUEST_ERROR, Constants.UNKNOWN_ERROR).build());
                 }
 
-                String parsedError = transferError.getTransferError().getAmount().get(0);
+                String parsedError = transferError.getTransactionError().getAmount().get(0);
 
                 Log.i(TAG, "parsedError=" + parsedError);
 
