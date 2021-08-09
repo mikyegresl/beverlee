@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import uz.alex.its.beverlee.R;
 import uz.alex.its.beverlee.utils.Constants;
@@ -66,9 +67,7 @@ public class WebDialogFragment extends DialogFragment {
         final View root = inflater.inflate(R.layout.dialog_web, container);
 
         webView = root.findViewById(R.id.web_view);
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.setVerticalScrollBarEnabled(true);
-        webView.loadUrl(replenishUrl);
+        webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
 
         return root;
     }
@@ -87,7 +86,13 @@ public class WebDialogFragment extends DialogFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setDimensions(80, requireContext());
+
+        setDimensions(100, requireContext());
+
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.setVerticalScrollBarEnabled(true);
+        webView.setWebViewClient(new WebViewClient());
+        webView.loadUrl(replenishUrl);
     }
 
     private static final String TAG = WebDialogFragment.class.toString();
