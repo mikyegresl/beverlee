@@ -94,7 +94,8 @@
                     android:textSize="13sp"
                     android:layout_weight="0.5"
                     android:gravity="center"
-                    android:button="@null"/>
+                    android:button="@null"
+                    android:background="@drawable/radio_btn_active"/>
 
                 <RadioButton
                     android:id="@+id/favorites_radio_btn"
@@ -106,7 +107,8 @@
                     android:textSize="13sp"
                     android:layout_weight="0.5"
                     android:gravity="center"
-                    android:button="@null"/>
+                    android:button="@null"
+                    android:background="@drawable/radio_btn_inactive"/>
             </RadioGroup>
 
             <androidx.recyclerview.widget.RecyclerView

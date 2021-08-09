@@ -251,9 +251,12 @@ public class MonitoringFragment extends Fragment {
             chartHidden = false;
             if (checkedId == incomeRadioBtn.getId()) {
                 incomeOrExpenditureTextView.setText(getString(R.string.income_or_expenditure, getString(R.string.income)));
-                radioGroup.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.radio_group_income, null));
+
                 incomeRadioBtn.setTextColor(getResources().getColor(R.color.colorWhite, null));
+                incomeRadioBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.radio_btn_active, null));
+
                 expenditureRadioBtn.setTextColor(getResources().getColor(R.color.colorDarkGrey, null));
+                expenditureRadioBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.radio_btn_inactive, null));
 
                 bonusOrPurchaseTextView.setBackgroundResource(R.drawable.text_wrap_orange);
                 receiptOrtransferTextView.setBackgroundResource(R.drawable.text_wrap_white);
@@ -267,9 +270,12 @@ public class MonitoringFragment extends Fragment {
             }
             if (checkedId == expenditureRadioBtn.getId()) {
                 incomeOrExpenditureTextView.setText(getString(R.string.income_or_expenditure, getString(R.string.expenditure)));
-                radioGroup.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.radio_group_exp, null));
+
                 incomeRadioBtn.setTextColor(getResources().getColor(R.color.colorDarkGrey, null));
+                incomeRadioBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.radio_btn_inactive, null));
+
                 expenditureRadioBtn.setTextColor(getResources().getColor(R.color.colorWhite, null));
+                expenditureRadioBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.radio_btn_active, null));
 
                 bonusOrPurchaseTextView.setBackgroundResource(R.drawable.text_wrap_purple);
                 receiptOrtransferTextView.setBackgroundResource(R.drawable.text_wrap_grey);

@@ -142,6 +142,7 @@
     <string name="phone_or_id">Номер телефона или ID</string>
     <!-- profile -->
     <string name="profile">Профиль</string>
+    <string name="low_current_balance"> Баланс не может быть меньше суммы перевода </string>
 
     <string name="profile_name">%1$s %2$s</string>
     <string name="identifier">Идентификатор: %s</string>
@@ -162,6 +163,7 @@
     <string name="country_example">Uzbekistan</string>
     <string name="save">Сохранить</string>
     <!-- notifications settings -->
+    <string name="settings"> Настройки </string>
     <string name="notifications">Уведомления</string>
     <string name="notify_default">Включить пуш-уведомления</string>
     <string name="notify_news">Уведомлять о новостях</string>

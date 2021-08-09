@@ -32,6 +32,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
+import ru.tinkoff.decoro.MaskImpl;
+import ru.tinkoff.decoro.slots.PredefinedSlots;
+import ru.tinkoff.decoro.slots.Slot;
+import ru.tinkoff.decoro.watchers.FormatWatcher;
+import ru.tinkoff.decoro.watchers.MaskFormatWatcher;
 import uz.alex.its.beverlee.R;
 import uz.alex.its.beverlee.model.Country;
 import uz.alex.its.beverlee.model.transaction.WithdrawalTypeModel.WithdrawalType;
@@ -77,6 +82,8 @@ public class WithdrawalFragment extends Fragment {
 
     private NetworkConnectivity networkConnectivity;
 
+    private FormatWatcher cardFormatWatcher;
+
     public WithdrawalFragment() {
         // Required empty public constructor
     }
@@ -93,6 +100,8 @@ public class WithdrawalFragment extends Fragment {
                     null);
         }
         networkConnectivity = new NetworkConnectivity(requireContext(), AppExecutors.getInstance());
+
+        cardFormatWatcher = new MaskFormatWatcher(MaskImpl.createTerminated(PredefinedSlots.CARD_NUMBER_STANDART));
 
         final TransactionViewModelFactory transactionFactory = new TransactionViewModelFactory(requireContext());
         final AuthViewModelFactory authViewModelFactory = new AuthViewModelFactory(requireContext());
@@ -188,6 +197,8 @@ public class WithdrawalFragment extends Fragment {
             cardWalletNumberTextView.setText(getString(R.string.recipient_wallet_number, currentWithdrawalType.getMethod()));
             cardWalletNumberEditText.setHint(getString(R.string.recipient_wallet_number, ""));
         }
+        cardFormatWatcher.installOn(cardWalletNumberEditText);
+
         recipientDataTextView.setText(getString(R.string.recipient_data, currentWithdrawalType.getMethod()));
         amountWithCommissionTextView.setText(getString(R.string.amount_with_commission, 0.0));
 
@@ -373,6 +384,28 @@ public class WithdrawalFragment extends Fragment {
             countrySpinner.setEnabled(false);
         });
     }
+
+    public static final Slot[] CARD_NUMBER_MASK = {
+            PredefinedSlots.digit(),
+            PredefinedSlots.digit(),
+            PredefinedSlots.digit(),
+            PredefinedSlots.digit(),
+            PredefinedSlots.hardcodedSlot(' ').withTags(Slot.TAG_DECORATION),
+            PredefinedSlots.digit(),
+            PredefinedSlots.digit(),
+            PredefinedSlots.digit(),
+            PredefinedSlots.digit(),
+            PredefinedSlots.hardcodedSlot(' ').withTags(Slot.TAG_DECORATION),
+            PredefinedSlots.digit(),
+            PredefinedSlots.digit(),
+            PredefinedSlots.digit(),
+            PredefinedSlots.digit(),
+            PredefinedSlots.hardcodedSlot(' ').withTags(Slot.TAG_DECORATION),
+            PredefinedSlots.digit(),
+            PredefinedSlots.digit(),
+            PredefinedSlots.digit(),
+            PredefinedSlots.digit(),
+    };
 
     private static final String TAG = WithdrawalFragment.class.toString();
 }

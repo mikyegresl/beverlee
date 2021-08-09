@@ -1,6 +1,7 @@
 package uz.alex.its.beverlee.view.activities;
 
 import android.Manifest;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -107,6 +108,11 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             if (itemId == R.id.navigation_contacts) {
                 currentNavItem = R.id.navigation_contacts;
                 Navigation.findNavController(this, R.id.home_fragment_container).navigate(R.id.contactsFragment);
+                return;
+            }
+            if (itemId == R.id.navigation_settings) {
+                currentNavItem = R.id.navigation_settings;
+                startActivity(new Intent(MainActivity.this, ProfileActivity.class));
             }
 
         }, 0);

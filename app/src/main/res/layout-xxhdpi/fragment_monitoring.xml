@@ -97,7 +97,8 @@
                     android:gravity="center"
                     android:text="@string/income"
                     android:textColor="@color/colorWhite"
-                    android:textSize="13sp" />
+                    android:textSize="13sp"
+                    android:background="@drawable/radio_btn_active"/>
 
                 <RadioButton
                     android:id="@+id/expenditure_radio_btn"
@@ -109,7 +110,8 @@
                     android:gravity="center"
                     android:text="@string/expenditure"
                     android:textColor="@color/colorDarkGrey"
-                    android:textSize="13sp" />
+                    android:textSize="13sp"
+                    android:background="@drawable/radio_btn_inactive"/>
             </RadioGroup>
 
             <include

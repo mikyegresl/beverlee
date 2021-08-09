@@ -153,16 +153,22 @@ public class ContactsFragment extends Fragment implements ContactCallback, Dialo
 
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == allRadioBtn.getId()) {
-                radioGroup.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.radio_group_income, null));
                 allRadioBtn.setTextColor(getResources().getColor(R.color.colorWhite, null));
+                allRadioBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.radio_btn_active, null));
+
                 favoritesRadioBtn.setTextColor(getResources().getColor(R.color.colorDarkGrey, null));
+                favoritesRadioBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.radio_btn_inactive, null));
+
                 contactsViewModel.setIsFavorite(false);
                 return;
             }
             if (checkedId == favoritesRadioBtn.getId()) {
-                radioGroup.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.radio_group_exp, null));
                 allRadioBtn.setTextColor(getResources().getColor(R.color.colorDarkGrey, null));
+                allRadioBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.radio_btn_inactive, null));
+
                 favoritesRadioBtn.setTextColor(getResources().getColor(R.color.colorWhite, null));
+                favoritesRadioBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.radio_btn_active, null));
+
                 contactsViewModel.setIsFavorite(true);
             }
         });

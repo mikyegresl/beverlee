@@ -91,26 +91,28 @@
                     android:id="@+id/income_radio_btn"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
+                    android:layout_weight="0.5"
+                    android:button="@null"
                     android:enabled="true"
+                    android:fontFamily="@font/geometria_medium"
+                    android:gravity="center"
                     android:text="@string/income"
                     android:textColor="@color/colorWhite"
-                    android:fontFamily="@font/geometria_medium"
                     android:textSize="13sp"
-                    android:layout_weight="0.5"
-                    android:gravity="center"
-                    android:button="@null"/>
+                    android:background="@drawable/radio_btn_active"/>
 
                 <RadioButton
                     android:id="@+id/expenditure_radio_btn"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
+                    android:layout_weight="0.5"
+                    android:button="@null"
+                    android:fontFamily="@font/geometria_medium"
+                    android:gravity="center"
                     android:text="@string/expenditure"
                     android:textColor="@color/colorDarkGrey"
-                    android:fontFamily="@font/geometria_medium"
                     android:textSize="13sp"
-                    android:layout_weight="0.5"
-                    android:gravity="center"
-                    android:button="@null"/>
+                    android:background="@drawable/radio_btn_inactive"/>
             </RadioGroup>
 
             <include
