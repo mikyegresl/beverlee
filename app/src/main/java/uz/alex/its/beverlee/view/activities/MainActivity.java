@@ -23,7 +23,7 @@ import uz.alex.its.beverlee.viewmodel.NotificationViewModel;
 import uz.alex.its.beverlee.viewmodel.factory.NotificationViewModelFactory;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemReselectedListener {
-    private BottomNavigationView bottomNavigationView;
+    private static BottomNavigationView bottomNavigationView;
     private static int currentNavItem;
 
     private NotificationViewModel notificationViewModel;
@@ -119,9 +119,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         return true;
     }
 
-    private void updateNavigationBarState(int itemId) {
+    public static void updateNavigationBarState(int itemId) {
         MenuItem item = bottomNavigationView.getMenu().findItem(itemId);
         item.setChecked(true);
+        setCurrentNavItem(itemId);
     }
 
     private static final String[] permissionArray = { Manifest.permission.READ_CONTACTS };

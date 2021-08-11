@@ -1,8 +1,20 @@
 package uz.alex.its.beverlee.view.fragments;
 
-import android.animation.ObjectAnimator;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,21 +26,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LinearInterpolator;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.TextView;
-
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -36,9 +33,6 @@ import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.w3c.dom.Text;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +40,8 @@ import java.util.List;
 import uz.alex.its.beverlee.R;
 import uz.alex.its.beverlee.model.transaction.TransactionModel;
 import uz.alex.its.beverlee.model.transaction.TransactionParams;
-import uz.alex.its.beverlee.storage.LocalDatabase;
 import uz.alex.its.beverlee.utils.DateFormatter;
+import uz.alex.its.beverlee.view.activities.MainActivity;
 import uz.alex.its.beverlee.view.adapters.TransactionAdapter;
 import uz.alex.its.beverlee.viewmodel.TransactionViewModel;
 import uz.alex.its.beverlee.viewmodel.factory.TransactionViewModelFactory;
@@ -130,6 +124,12 @@ public class MonitoringFragment extends Fragment {
         }
         transactionViewModel.setTransactionParams(params);
         transactionViewModel.fetchTransactionList();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MainActivity.updateNavigationBarState(R.id.navigation_monitoring);
     }
 
     @Override
@@ -216,9 +216,7 @@ public class MonitoringFragment extends Fragment {
 
         incomeOrExpenditureTextView.setText(getString(R.string.income_or_expenditure, getString(R.string.income)));
 
-        fab.setOnClickListener(v -> {
-            NavHostFragment.findNavController(this).navigate(R.id.action_monitoringFragment_to_transferFragment);
-        });
+        fab.setOnClickListener(v -> NavHostFragment.findNavController(this).navigate(R.id.action_monitoringFragment_to_transferFragment));
 
         /* header */
         searchFieldEditText.setOnFocusChangeListener((v, hasFocus) -> {
@@ -303,9 +301,7 @@ public class MonitoringFragment extends Fragment {
                             .setIsIncome(radioGroup.getCheckedRadioButtonId() == incomeRadioBtn.getId()));
         });
 
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            transactionViewModel.fetchTransactionList();
-        });
+        swipeRefreshLayout.setOnRefreshListener(() -> transactionViewModel.fetchTransactionList());
 
         if (transactionViewModel.getParams().getTransactionTypeId() == 2
                 || transactionViewModel.getParams().getTransactionTypeId() == 4

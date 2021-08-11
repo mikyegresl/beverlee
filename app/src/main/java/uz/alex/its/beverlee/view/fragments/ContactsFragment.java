@@ -46,6 +46,7 @@ import uz.alex.its.beverlee.model.actor.ContactModel.ContactData;
 import uz.alex.its.beverlee.storage.LocalDatabase;
 import uz.alex.its.beverlee.utils.Constants;
 import uz.alex.its.beverlee.view.UiUtils;
+import uz.alex.its.beverlee.view.activities.MainActivity;
 import uz.alex.its.beverlee.view.adapters.ContactAdapter;
 import uz.alex.its.beverlee.view.dialog.ContactsBottomSheet;
 import uz.alex.its.beverlee.view.dialog.FavContactsBottomSheet;
@@ -97,6 +98,12 @@ public class ContactsFragment extends Fragment implements ContactCallback, Dialo
         contactsViewModel = new ViewModelProvider(getViewModelStore(), contactsFactory).get(ContactsViewModel.class);
 
         contactsViewModel.fetchContactList(null, null);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MainActivity.updateNavigationBarState(R.id.navigation_contacts);
     }
 
     @Override

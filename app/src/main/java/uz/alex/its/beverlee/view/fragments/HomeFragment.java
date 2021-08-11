@@ -40,6 +40,7 @@ import uz.alex.its.beverlee.storage.SharedPrefs;
 import uz.alex.its.beverlee.utils.Constants;
 import uz.alex.its.beverlee.utils.DateFormatter;
 import uz.alex.its.beverlee.view.LineChart;
+import uz.alex.its.beverlee.view.activities.MainActivity;
 import uz.alex.its.beverlee.view.activities.ProfileActivity;
 import uz.alex.its.beverlee.view.adapters.ContactAdapter;
 import uz.alex.its.beverlee.view.adapters.NewsAdapter;
@@ -146,6 +147,12 @@ public class HomeFragment extends Fragment implements ContactCallback, NewsCallb
         newsViewModel.fetchNews(null, null);
 
         Log.i(TAG, "fcmToken=" + SharedPrefs.getInstance(requireContext()).getString(Constants.FCM_TOKEN));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MainActivity.updateNavigationBarState(R.id.navigation_home);
     }
 
     @Override
