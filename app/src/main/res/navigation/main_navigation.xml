@@ -59,6 +59,9 @@
         <action
             android:id="@+id/action_debitFragment_to_transactionResultFragment"
             app:destination="@id/transactionResultFragment" />
+        <action
+            android:id="@+id/action_debitFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
     </fragment>
     <fragment
         android:id="@+id/notificationsFragment"

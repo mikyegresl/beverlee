@@ -1,5 +1,6 @@
 package uz.alex.its.beverlee.view.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import androidx.work.WorkInfo;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -160,6 +162,7 @@ public class ReplenishFragment extends Fragment {
                 //open web url in webView
 
                 final WebDialogFragment webDialog = WebDialogFragment.newInstance(workInfo.getOutputData().getString(Constants.REPLENISH_URL));
+                webDialog.setTargetFragment(this, Constants.REQUEST_CODE_REPLENISH);
                 webDialog.show(getParentFragmentManager().beginTransaction(), TAG);
 
                 progressBar.setVisibility(View.GONE);
@@ -175,6 +178,17 @@ public class ReplenishFragment extends Fragment {
             progressBar.setVisibility(View.VISIBLE);
             amountEditText.setEnabled(false);
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == Activity.RESULT_OK
+                && data != null
+                && data.getIntExtra(Constants.RESULT_TYPE_REPLENISH, 0) == Constants.RESULT_CODE_TO_MAIN) {
+            NavHostFragment.findNavController(this).navigate(R.id.action_debitFragment_to_homeFragment);
+        }
     }
 
     private static final String TAG = ReplenishFragment.class.toString();

@@ -1,6 +1,8 @@
 package uz.alex.its.beverlee.view.dialog;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
@@ -8,8 +10,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.core.widgets.Rectangle;
 import androidx.fragment.app.DialogFragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +22,10 @@ import android.webkit.WebViewClient;
 
 import uz.alex.its.beverlee.R;
 import uz.alex.its.beverlee.utils.Constants;
+import uz.alex.its.beverlee.utils.WebFormClient;
+import uz.alex.its.beverlee.view.interfaces.WebFormCallback;
 
-public class WebDialogFragment extends DialogFragment {
+public class WebDialogFragment extends DialogFragment implements WebFormCallback {
     private WebView webView;
     private String replenishUrl;
 
@@ -91,8 +97,19 @@ public class WebDialogFragment extends DialogFragment {
 
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setVerticalScrollBarEnabled(true);
-        webView.setWebViewClient(new WebViewClient());
+        webView.setWebViewClient(new WebFormClient(replenishUrl, this));
         webView.loadUrl(replenishUrl);
+    }
+
+    @Override
+    public void toMainPage() {
+        if (getTargetFragment() == null) {
+            Log.e(TAG, "targetFragment is NULL");
+            return;
+        }
+        getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, new Intent()
+                .putExtra(Constants.RESULT_TYPE_REPLENISH, Constants.RESULT_CODE_TO_MAIN));
+        dismiss();
     }
 
     private static final String TAG = WebDialogFragment.class.toString();

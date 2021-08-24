@@ -111,6 +111,7 @@ public class Constants {
     public static final int REQUEST_CODE_VERIFY_PURCHASE = 0x105;
     public static final int REQUEST_CODE_BOTTOM_SHEET_CONTACTS = 0x106;
     public static final int REQUEST_CODE_BOTTOM_SHEET_FAVORITES = 0x107;
+    public static final int REQUEST_CODE_REPLENISH = 0x108;
 
     /* result codes */
     public static final int RESULT_CODE_TRANSFER_TO_CONTACT = 0x200;
@@ -118,4 +119,6 @@ public class Constants {
     public static final int RESULT_CODE_DELETE_CONTACT = 0x202;
     public static final int RESULT_CODE_ADD_TO_FAVS = 0x203;
     public static final int RESULT_CODE_REMOVE_FROM_FAVS = 0x204;
+    public static final int RESULT_CODE_TO_MAIN = 0x205;
+
 }
